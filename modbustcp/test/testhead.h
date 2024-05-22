@@ -1,6 +1,6 @@
 // including the required header files
-#include "..\modhead.h"
-#include "..\libModbus\ModbusTcp.h"
+#include "..\modbusTcptydef.h"
+#include "..\libModbusTcp\modbusTcp.h"
 #include <stdio.h>
 // #include <stdint.h>
 

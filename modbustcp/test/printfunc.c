@@ -63,4 +63,7 @@ void printfunction()
 
     printf("\n");
     printf(ANSI_COLOR_RESET); // Reset color to default
+    printf("\n");
+    printf("***********************************************************************************************************");
+    printf("\n");
 }

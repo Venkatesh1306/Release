@@ -1,9 +1,9 @@
-    /*******************************************************************
+/*******************************************************************
 
-                  Generic Type Definitions
+                  ModbusTCP Type Definitions
 
 ********************************************************************
- FileName:        GenericTypeDefs.h
+ FileName:        modbusTcptypedef.h
  Dependencies:    None
  Processor:       PIC10, PIC12, PIC16, PIC18, PIC24, dsPIC, PIC32
  Compiler:        MPLAB C Compilers for PIC18, PIC24, dsPIC, & PIC32
@@ -44,8 +44,8 @@
   2.0   07/13/09     Updated for new release of coding standards
 *******************************************************************/
 
-#ifndef __MODHEAD_H_
-#define __MODHEAD_H_
+#ifndef __MODBUSTCPTYPEDEF_H_
+#define __MODBUSTCPTYPEDEF_H_
 
 /* Specify an extension for GCC based compilers */
 #if defined(__GNUC__)
@@ -68,13 +68,13 @@ typedef char                    char8_t;
 typedef unsigned char           uchar8_t;
 
 typedef unsigned char           uint8_t;                           /* 8-bit unsigned  */
-typedef unsigned short int      uint16_t;                           /* 16-bit unsigned */
+typedef unsigned int            uint16_t;                           /* 16-bit unsigned */
 typedef unsigned long           uint32_t;                          /* 32-bit unsigned */
 /* MPLAB C Compiler for PIC18 does not support 64-bit integers */
 __EXTENSION
 typedef unsigned long long      uint64_t;                          /* 64-bit unsigned */
 typedef signed char             char_t;                           /* 8-bit signed    */
-typedef signed short int        short_t;                          /* 16-bit signed   */
+typedef signed int        short_t;                          /* 16-bit signed   */
 typedef signed long             long_t;                           /* 32-bit signed   */
 /* MPLAB C Compiler for PIC18 does not support 64-bit integers */
 __EXTENSION

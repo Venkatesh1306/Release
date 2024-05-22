@@ -34,27 +34,21 @@
  *      Example : # include "ModbusTcp.h"
 */
 
-#include "..\modhead.h"
+#include "..\modbusTcptydef.h"
 
 #ifndef MODBUSTCP_H
 #define MODBUSTCP_H
 
 /* Function Code Definitions */
-#define ReadCoilStatus 01
-#define ReadInputStatus 02
 #define ReadHoldingRegister 03
-#define ReadInputRegisters 04
-#define ForceSingleCoil 05
 #define PresetSingleRegister 06
-#define ForceMultipleCoils 15
 #define PresetMultipleRegisters 16
 
 /* Definitions for size which the array and variables not be exceed*/
 #define DataRegistersize 0x7d
-#define DataRegister1size 0x100
+#define DataRegistersizeCheck (DataRegistersize - 1)
 #define MaxSizeTcpTx 100
-#define MaxSizeTxtempbuf 30
-#define MaxSizeCoilData 25
+#define IllegalDataCheck 65000
 
 /*Error Code Definitions */
 #define Illegal_Function_Code 0x01u
@@ -73,9 +67,7 @@ typedef struct
   uint16_t_VAL numberofRegister;
   uint16_t byteCount;
   uint16_t_VAL preset_Data;
-  uint16_t coilData[25];
-  uint16_t_VAL forceData[25];
-  uint16_t_VAL data[100];
+  uint16_t_VAL data[DataRegistersize];
 
 } mbPacketParse_t;
 

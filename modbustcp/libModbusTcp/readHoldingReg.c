@@ -29,7 +29,7 @@ uint16_t readHoldingRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mb
 {
   /* Declaration of local variables*/
   uint16_t length = 0;
-  unsigned int a, b;
+  uint16_t a =0, b=0;
 
   /* Assigning values for transmitting buffer*/
   p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];

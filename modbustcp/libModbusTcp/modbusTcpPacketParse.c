@@ -16,8 +16,8 @@ Function name    : uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData
 #include "modbusTcp.h"
 
 /* Global declaration of variables*/
-unsigned int c2, d2, bytesrx;
-unsigned char exceptioncode;
+uint16_t c2, d2, bytesrx;
+uint8_t exceptioncode;
 
 uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData, const uint8_t *p_modbusRxBuf)
 {
@@ -53,7 +53,7 @@ uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData, const uint8_t *p_
 
     p_parseModbusTcpData->byteCount = p_modbusRxBuf[12];
 
-    if (p_parseModbusTcpData->numberofRegister.Val < 0x7d) /* checks for overflow of data array size*/
+    if (p_parseModbusTcpData->numberofRegister.Val < (int)(DataRegistersizeCheck)) /* checks for overflow of data array size*/
     {
       for (c2 = 0; c2 < p_parseModbusTcpData->numberofRegister.Val; c2++)
       {

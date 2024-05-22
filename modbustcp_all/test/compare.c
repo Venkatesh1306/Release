@@ -1,6 +1,6 @@
 #include "testhead.h"
 // function for testing the output with the expected output
-uint16_t Test_ing(const uint8_t ModbusTxBuf[], const uint8_t Test_tx[])
+uint16_t Test_ing(const uint8_t ModbusTxBuf[], const uint8_t expec_TX[])
 {
     Test_Res = 1;
     test_c = 0;
@@ -31,7 +31,9 @@ uint16_t Test_ing(const uint8_t ModbusTxBuf[], const uint8_t Test_tx[])
 
         int reg = (ModbusRxBuf[9] - 1) / 16;
         int bit = (ModbusRxBuf[9] - 1) % 16;
+        test_c = (Dataregister[reg] == COIL1[reg]) ? 1 : 0;
         //printf("\n before -- %04x - %04x", Dataregister[reg], COIL1[reg]);
+        if(ModbusTxBuf[7] < 0x80){
         if (ModbusRxBuf[10] == 0xff)
         {
             SET(COIL1[reg], bit);
@@ -42,7 +44,8 @@ uint16_t Test_ing(const uint8_t ModbusTxBuf[], const uint8_t Test_tx[])
         }
         //printf("\n change -- %04x - %04x", Dataregister[reg], COIL1[reg]);
         test_c = (Dataregister[reg] != COIL1[reg]) ? 1 : 0;
-        printf("%d",test_c);
+        }
+        //printf("%d",test_c);
     }
 
     if (ModbusRxBuf[7] == 0x0f)
@@ -94,8 +97,8 @@ uint16_t Test_ing(const uint8_t ModbusTxBuf[], const uint8_t Test_tx[])
     // send packet check for all function code
     for (increment = 0; increment < numRegisters; increment++)
     {
-        // Test_Res = (ModbusTxBuf[increment] != Test_tx[increment]) ? 0 : 1;
-        if ((ModbusTxBuf[increment] != Test_tx[increment]))
+        // Test_Res = (ModbusTxBuf[increment] != expec_TX[increment]) ? 0 : 1;
+        if ((ModbusTxBuf[increment] != expec_TX[increment]))
         {
             Test_Res = 0;
             break; // Exit the loop or block

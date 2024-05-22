@@ -25,53 +25,48 @@ RESPONSE FRAME:
 
  */
 
-#include "ModbusTcp.h"
+#include "modbusTcp.h"
 
-uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData)
-{
-  /*Local variable declaration */
-  uint16_t length = 0;
-  unsigned int limit = 0;
+uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData) {
 
-  /* Assigning values for transmitting buffer*/
-  p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
-  p_modbusTxBuf[1] = p_parseModbusTcpData->transactionID.v[0];
+    /*Local variable declaration */
+    uint16_t length = 0;
+    uint16_t limit = 0;
 
-  p_modbusTxBuf[2] = p_parseModbusTcpData->protocolID.v[1];
-  p_modbusTxBuf[3] = p_parseModbusTcpData->protocolID.v[0];
-
-  p_modbusTxBuf[4] = 0X0;
-
-  p_modbusTxBuf[6] = p_parseModbusTcpData->unitID;
-
-  p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
-
-  for (limit = 0; limit < p_parseModbusTcpData->numberofRegister.v[0]; limit++)
-  {
-    if (p_parseModbusTcpData->data[limit].Val >= 65000) /* checks for illegal data value */
-    {
-
-      p_parseModbusTcpData->functionCode = p_parseModbusTcpData->functionCode + 0x80;
-      modbusError(p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Value);
-      limit = p_parseModbusTcpData->numberofRegister.v[0] + 1;
-      length = 0X09;
-    }
-    else
-    {
-      p_dataMemory[p_parseModbusTcpData->startAddress.Val + limit] = p_parseModbusTcpData->data[limit].v[0] +
-                                                                     (p_parseModbusTcpData->data[limit].v[1] * 0x100); /* Writes the data to register */ 
-    }
-  }
-  if (0x10 == p_parseModbusTcpData->functionCode)
-  {
     /* Assigning values for transmitting buffer*/
-    p_modbusTxBuf[8] = p_parseModbusTcpData->startAddress.v[1];
-    p_modbusTxBuf[9] = p_parseModbusTcpData->startAddress.v[0];
-    p_modbusTxBuf[10] = p_parseModbusTcpData->numberofRegister.v[1];
-    p_modbusTxBuf[11] = p_parseModbusTcpData->numberofRegister.v[0];
-    p_modbusTxBuf[5] = 0x06;
-    length = 0x12;
-  }
+    p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
+    p_modbusTxBuf[1] = p_parseModbusTcpData->transactionID.v[0];
 
-  return length;
+    p_modbusTxBuf[2] = p_parseModbusTcpData->protocolID.v[1];
+    p_modbusTxBuf[3] = p_parseModbusTcpData->protocolID.v[0];
+
+    p_modbusTxBuf[4] = 0X0;
+
+    p_modbusTxBuf[6] = p_parseModbusTcpData->unitID;
+
+    p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
+
+    for (limit = 0; limit < p_parseModbusTcpData->numberofRegister.v[0]; limit++) {
+        if (p_parseModbusTcpData->data[limit].Val >= IllegalDataCheck) /* checks for illegal data value */ {
+
+            p_parseModbusTcpData->functionCode = p_parseModbusTcpData->functionCode + 0x80;
+            modbusError(p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Value);
+            limit = p_parseModbusTcpData->numberofRegister.v[0] + 1;
+            length = 0X09;
+        } else {
+            p_dataMemory[p_parseModbusTcpData->startAddress.Val + limit] = p_parseModbusTcpData->data[limit].v[0] +
+                    (p_parseModbusTcpData->data[limit].v[1] * 0x100); /* Writes the data to register */
+        }
+    }
+    if (0x10 == p_parseModbusTcpData->functionCode) {
+        /* Assigning values for transmitting buffer*/
+        p_modbusTxBuf[8] = p_parseModbusTcpData->startAddress.v[1];
+        p_modbusTxBuf[9] = p_parseModbusTcpData->startAddress.v[0];
+        p_modbusTxBuf[10] = p_parseModbusTcpData->numberofRegister.v[1];
+        p_modbusTxBuf[11] = p_parseModbusTcpData->numberofRegister.v[0];
+        p_modbusTxBuf[5] = 0x06;
+        length = 0x12;
+    }
+
+    return length;
 }

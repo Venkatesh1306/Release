@@ -22,37 +22,35 @@ RESPONSE FRAME:
  * RESPONSE FRAME = {0x0, 0x1, 0x2, 0x3, 0x0, 0x3, 0x10, 0x91, 0x1} - 9 bytes
  */
 
-#include "ModbusTcp.h"
+#include "modbusTcp.h"
 
+uint16_t readHoldingRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData) {
 
-uint16_t readHoldingRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData)
-{
-  /* Declaration of local variables*/
-  uint16_t length = 0;
-  unsigned int a, b;
+    /* Declaration of local variables*/
+    uint16_t length = 0;
+    uint16_t a = 0, b = 0;
 
-  /* Assigning values for transmitting buffer*/
-  p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
-  p_modbusTxBuf[1] = p_parseModbusTcpData->transactionID.v[0];
+    /* Assigning values for transmitting buffer*/
+    p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
+    p_modbusTxBuf[1] = p_parseModbusTcpData->transactionID.v[0];
 
-  p_modbusTxBuf[2] = p_parseModbusTcpData->protocolID.v[1];
-  p_modbusTxBuf[3] = p_parseModbusTcpData->protocolID.v[0];
+    p_modbusTxBuf[2] = p_parseModbusTcpData->protocolID.v[1];
+    p_modbusTxBuf[3] = p_parseModbusTcpData->protocolID.v[0];
 
-  p_modbusTxBuf[4] = 0X0;
+    p_modbusTxBuf[4] = 0X0;
 
-  p_modbusTxBuf[6] = p_parseModbusTcpData->unitID;
-  p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
-  p_modbusTxBuf[8] = p_parseModbusTcpData->numberofRegister.Val * 2;
-  p_modbusTxBuf[5] = p_modbusTxBuf[8] + 0X03;
+    p_modbusTxBuf[6] = p_parseModbusTcpData->unitID;
+    p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
+    p_modbusTxBuf[8] = p_parseModbusTcpData->numberofRegister.Val * 2;
+    p_modbusTxBuf[5] = p_modbusTxBuf[8] + 0X03;
 
-  for (a = 0; a < p_parseModbusTcpData->numberofRegister.Val; a++)
-  {
-    b = a * 2;
+    for (a = 0; a < p_parseModbusTcpData->numberofRegister.Val; a++) {
+        b = a * 2;
 
-    p_modbusTxBuf[9 + b] = p_dataMemory[p_parseModbusTcpData->startAddress.Val + a] / 0x100;
-    p_modbusTxBuf[10 + b] = p_dataMemory[p_parseModbusTcpData->startAddress.Val + a] % 0x100;
-  }
+        p_modbusTxBuf[9 + b] = p_dataMemory[p_parseModbusTcpData->startAddress.Val + a] / 0x100;
+        p_modbusTxBuf[10 + b] = p_dataMemory[p_parseModbusTcpData->startAddress.Val + a] % 0x100;
+    }
 
-  length = 0x9 + p_modbusTxBuf[8];
-  return length;
+    length = 0x9 + p_modbusTxBuf[8];
+    return length;
 }

@@ -43,7 +43,7 @@ uint16_t presetSingleRegister(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mb
   p_modbusTxBuf[6] = p_parseModbusTcpData->unitID;
   p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
 
-  if (p_parseModbusTcpData->preset_Data.Val >= 65000) /* checks for illegal data value */
+  if (p_parseModbusTcpData->preset_Data.Val >= (int)(IllegalDataCheck)) /* checks for illegal data value */
   {
     p_parseModbusTcpData->functionCode = p_parseModbusTcpData->functionCode + 0x80;
     modbusError(p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Value);

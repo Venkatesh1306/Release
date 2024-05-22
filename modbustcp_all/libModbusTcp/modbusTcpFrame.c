@@ -14,138 +14,121 @@ Function name : uint16_t modbusTcpFrame(const uint8_t *p_modbusRxBuf, uint16_t *
  * Required      :  modbusTcpRxBuf,dataMemory
  * Error Handling: This function checks for the modbus exception cases in the query message and provide response
  * according to the nature of the error and exception code.
-*/
+ */
 
-#include "ModbusTcp.h"
+#include "modbusTcp.h"
 
 /*Global Declaration*/
 mbPacketParse_t p_parseModbusTcpData;
 
-uint16_t modbusTcpFrame(const uint8_t *p_modbusRxBuf, uint16_t *p_dataMemory, uint8_t *p_modbusTxBuf, uint16_t *modBusframeLength)
-{
+uint16_t modbusTcpFrame(const uint8_t *p_modbusRxBuf, uint16_t *p_dataMemory, uint8_t *p_modbusTxBuf, uint16_t *modBusframeLength) {
 
-  modbusTcpParse(&p_parseModbusTcpData, p_modbusRxBuf); /* Parse Function*/
+    modbusTcpParse(&p_parseModbusTcpData, p_modbusRxBuf); /* Parse Function*/
 
-  /* Function Code Error */
-  if (!(  ReadCoilStatus          ==  p_parseModbusTcpData.functionCode||
-          ReadInputStatus         ==  p_parseModbusTcpData.functionCode||
-          ReadHoldingRegister     ==  p_parseModbusTcpData.functionCode||
-          ReadInputRegisters      ==  p_parseModbusTcpData.functionCode||
-          ForceSingleCoil         ==  p_parseModbusTcpData.functionCode||
-          PresetSingleRegister    ==  p_parseModbusTcpData.functionCode||
-          ForceMultipleCoils      ==  p_parseModbusTcpData.functionCode||
-          PresetMultipleRegisters ==  p_parseModbusTcpData.functionCode))
-  {
-    p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
-    modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Function_Code);
-    *modBusframeLength = 0x9;
-  }
-
-  /* ModtbusTcptx packet size overflow considered as Data Error */
-  else if (p_parseModbusTcpData.numberofRegister.Val > (MaxSizeTcpTx - 8))
-  {
-    p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
-    modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Value);
-    *modBusframeLength = 0x9;
-  }
-
-  /* Address Error for Function code - 03,04,10(Hex) */
-  else if ( ReadHoldingRegister      ==  p_parseModbusTcpData.functionCode||
-            ReadInputRegisters       ==  p_parseModbusTcpData.functionCode ||
-            PresetMultipleRegisters  ==  p_parseModbusTcpData.functionCode)
-  {
-    if ((p_parseModbusTcpData.startAddress.Val > (int)(DataRegistersize)) ||
-        ((p_parseModbusTcpData.startAddress.Val + p_parseModbusTcpData.numberofRegister.Val) > (int)(DataRegistersize)))
-    {
-      p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
-      modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Address);
-      *modBusframeLength = 0x9;
+    /* Function Code Error */
+    if (!(ReadCoilStatus == p_parseModbusTcpData.functionCode ||
+            ReadInputStatus == p_parseModbusTcpData.functionCode ||
+            ReadHoldingRegister == p_parseModbusTcpData.functionCode ||
+            ReadInputRegisters == p_parseModbusTcpData.functionCode ||
+            ForceSingleCoil == p_parseModbusTcpData.functionCode ||
+            PresetSingleRegister == p_parseModbusTcpData.functionCode ||
+            ForceMultipleCoils == p_parseModbusTcpData.functionCode ||
+            PresetMultipleRegisters == p_parseModbusTcpData.functionCode)) {
+        p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
+        modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Function_Code);
+        *modBusframeLength = 0x9;
     }
-  }
-
-  /* Address Error for Function code - 01,02,0f(Hex) */
-  else if ( ReadCoilStatus      ==  p_parseModbusTcpData.functionCode ||
-            ReadInputStatus     ==  p_parseModbusTcpData.functionCode ||
-            ForceMultipleCoils  ==  p_parseModbusTcpData.functionCode   )
-  {
-    if ((p_parseModbusTcpData.startAddress.Val > (int)(DataRegister1size)) ||
-        ((p_parseModbusTcpData.startAddress.Val + p_parseModbusTcpData.numberofRegister.Val) > (int)(DataRegister1size)))
-    {
-      p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
-      modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Address);
-      *modBusframeLength = 0x9;
+        /* ModtbusTcptx packet size overflow considered as Data Error */
+    else if (p_parseModbusTcpData.numberofRegister.Val > (MaxSizeTcpTx - 8)) {
+        p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
+        modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Value);
+        *modBusframeLength = 0x9;
     }
-  }
-
-  /* Address Error for Function code - 05(Hex) */
-  else if (p_parseModbusTcpData.functionCode == ForceSingleCoil)
-  {
-    if (p_parseModbusTcpData.startAddress.Val > (int)(DataRegister1size))
-    {
-
-      p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
-      modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Address);
-      *modBusframeLength = 0x9;
+        /* Address Error for Function code - 03,04,10(Hex) */
+    else if (ReadHoldingRegister == p_parseModbusTcpData.functionCode ||
+            ReadInputRegisters == p_parseModbusTcpData.functionCode ||
+            PresetMultipleRegisters == p_parseModbusTcpData.functionCode) {
+        if ((p_parseModbusTcpData.startAddress.Val > (int) (DataRegistersize)) ||
+                ((p_parseModbusTcpData.startAddress.Val + p_parseModbusTcpData.numberofRegister.Val) > (int) (DataRegistersize))) {
+            p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
+            modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Address);
+            *modBusframeLength = 0x9;
+        }
     }
-  }
-
-  /* Address Error for Function code - 06(Hex) */
-  else if (p_parseModbusTcpData.functionCode == PresetSingleRegister)
-  {
-    if (p_parseModbusTcpData.startAddress.Val > (int)(DataRegistersize))
-    {
-      p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
-      modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Address);
-      *modBusframeLength = 0x9;
+        /* Address Error for Function code - 01,02,0f(Hex) */
+    else if (ReadCoilStatus == p_parseModbusTcpData.functionCode ||
+            ReadInputStatus == p_parseModbusTcpData.functionCode ||
+            ForceMultipleCoils == p_parseModbusTcpData.functionCode) {
+        if ((p_parseModbusTcpData.startAddress.Val > (int) (CoilDatasize)) ||
+                ((p_parseModbusTcpData.startAddress.Val + p_parseModbusTcpData.numberofRegister.Val) > (int) (CoilDatasize))) {
+            p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
+            modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Address);
+            *modBusframeLength = 0x9;
+        }
     }
-  }
+        /* Address Error for Function code - 05(Hex) */
+    else if (p_parseModbusTcpData.functionCode == ForceSingleCoil) {
+        if (p_parseModbusTcpData.startAddress.Val > (int) (CoilDatasize)) {
 
-  /* Response function, specific to function code */
-  switch (p_parseModbusTcpData.functionCode)
-  {
+            p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
+            modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Address);
+            *modBusframeLength = 0x9;
+        }
+    }
+        /* Address Error for Function code - 06(Hex) */
+    else if (p_parseModbusTcpData.functionCode == PresetSingleRegister) {
+        if (p_parseModbusTcpData.startAddress.Val > (int) (DataRegistersize)) {
+            p_parseModbusTcpData.functionCode = p_parseModbusTcpData.functionCode + 0x80;
+            modbusError(&p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Address);
+            *modBusframeLength = 0x9;
+        }
+    }
 
-  case ReadHoldingRegister:
+    /* Response function, specific to function code */
+    switch (p_parseModbusTcpData.functionCode) {
 
-    *modBusframeLength = readHoldingRegisters(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
-    break;
+        case ReadHoldingRegister:
 
-  case PresetSingleRegister:
+            *modBusframeLength = readHoldingRegisters(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
+            break;
 
-    *modBusframeLength = presetSingleRegister(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
-    break;
+        case PresetSingleRegister:
 
-  case PresetMultipleRegisters:
+            *modBusframeLength = presetSingleRegister(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
+            break;
 
-    *modBusframeLength = presetMultipleRegisters(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
-    break;
+        case PresetMultipleRegisters:
 
-  case ReadInputStatus:
+            *modBusframeLength = presetMultipleRegisters(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
+            break;
 
-    *modBusframeLength = readInputStatus(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
-    break;
+        case ReadInputStatus:
 
-  case ReadCoilStatus:
+            *modBusframeLength = readInputStatus(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
+            break;
 
-    *modBusframeLength = readCoilStatus(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
-    break;
+        case ReadCoilStatus:
 
-  case ReadInputRegisters:
+            *modBusframeLength = readCoilStatus(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
+            break;
 
-    *modBusframeLength = readInputReg(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
-    break;
+        case ReadInputRegisters:
 
-  case ForceMultipleCoils:
+            *modBusframeLength = readInputReg(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
+            break;
 
-    *modBusframeLength = forceMultipleCoils(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
-    break;
+        case ForceMultipleCoils:
 
-  case ForceSingleCoil:
+            *modBusframeLength = forceMultipleCoils(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
+            break;
 
-    *modBusframeLength = forceSingleCoil(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
-    break;
+        case ForceSingleCoil:
 
-  default:
-    break;
-  }
-  return *modBusframeLength;
+            *modBusframeLength = forceSingleCoil(p_modbusTxBuf, p_dataMemory, &p_parseModbusTcpData);
+            break;
+
+        default:
+            break;
+    }
+    return *modBusframeLength;
 }

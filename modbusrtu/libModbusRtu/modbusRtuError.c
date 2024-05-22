@@ -45,7 +45,7 @@ ADDRESS ERROR:(0X02)
 
 #include "modbusRtu.h"
 
-void modbusError(mbPacketParse_t *p_parseModbusRtuData, uint8_t *p_modbusTxBuf, unsigned char exceptioncode)
+void modbusError(mbPacketParse_t *p_parseModbusRtuData, uint8_t *p_modbusTxBuf, uint8_t exceptioncode)
 {
   /* Assigning values for modbustx buffer */
   p_modbusTxBuf[0] = p_parseModbusRtuData->slave_addr.Val;

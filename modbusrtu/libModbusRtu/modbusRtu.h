@@ -31,7 +31,7 @@
  *      Example: #include "ModbusRtu.h"
  */
 
-#include "../modhead.h"
+#include "../modbusRtutypedef.h"
 
 #ifndef MODBUSRTU_H
 #define MODBUSRTU_H
@@ -43,6 +43,9 @@
 
 /* Size of address declaration */
 #define DataRegistersize 0x7d
+#define DataRegistersizeCheck (DataRegistersize - 1)
+#define IllegalDataCheck 65000
+#define MaxSizeRtuTx 100
 
 /* Error Code Declaration */
 #define Illegal_Function_Code 0x01u
@@ -52,7 +55,6 @@
 /* Structure variable Declaration */
 typedef struct
 {
-
     uint16_t_VAL slave_addr;
     uint8_t functionCode;
     uint16_t_VAL startAddress;
@@ -71,7 +73,7 @@ uint16_t modbusRtuParse(mbPacketParse_t *p_parseModbusRtuData, const uint8_t *p_
 uint16_t readHoldingRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusRtuData);               /* Function Code - 0x03 */
 uint16_t presetSingleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusRtuData);              /* Function Code - 0x06 */
 uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusRtuData);            /* Function Code - 0x10 */
-void modbusError(mbPacketParse_t *p_parseModbusRtuData, uint8_t *p_modbusTxBuf, unsigned char exceptioncode);                       /* Error Function */
+void modbusError(mbPacketParse_t *p_parseModbusRtuData, uint8_t *p_modbusTxBuf, uint8_t exceptioncode);                             /* Error Function */
 
 uint8_t getLOWbyte(uint16_t input);
 uint8_t getHIGHbyte(uint16_t input);

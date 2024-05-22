@@ -57,8 +57,8 @@ void printfunction()
     printf("\n");
 
     printf("Expected Response:\n");
-    for (int i = 0; i < Test_TXtest[incrs][0]; i++)
-        printf("%02X ", Test_tx[i]);
+    for (int i = 0; i < expected_TXA[incrs][0]; i++)
+        printf("%02X ", expec_TX[i]);
     printf("\n");
 
     printf("Actual Response:\n");
@@ -71,7 +71,7 @@ void printfunction()
 
     printf(Test_Res == 1 ? ANSI_COLOR_GREEN " Test Passed" : ANSI_COLOR_RED " Test failed\n");
 
-    if (ModbusRxBuf[7] == 0x6 || ModbusRxBuf[7] == 0x10 || ModbusTxBuf[7] == 0x05 || ModbusRxBuf[7] == 0x0f)
+    if ((ModbusRxBuf[7] == 0x05) || (ModbusRxBuf[7] == 0x6) ||  (ModbusRxBuf[7] == 0x10)  || (ModbusRxBuf[7] == 0x0f))
 
         printf(test_c == 1 ? ANSI_COLOR_RED " - Data not Entered" : ANSI_COLOR_GREEN " - Data Entered");
 

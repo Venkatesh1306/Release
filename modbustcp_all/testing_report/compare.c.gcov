@@ -1,0 +1,111 @@
+        -:    0:Source:Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/test/compare.c
+        -:    0:Programs:14
+        -:    1:#include "testhead.h"
+        -:    2:// function for testing the output with the expected output
+       36:    3:uint16_t Test_ing(const uint8_t ModbusTxBuf[], const uint8_t expec_TX[])
+        -:    4:{
+       36:    5:    Test_Res = 1;
+       36:    6:    test_c = 0;
+        -:    7:
+        -:    8:    // Data enter check for FC 0x06
+       36:    9:    if (ModbusRxBuf[7] == 0x06)
+        -:   10:    {
+        6:   11:        add = (ModbusRxBuf[8] << 8) | ModbusRxBuf[9];
+        6:   12:        test_c = (Dataregister[add] != ((ModbusRxBuf[10] << 8) | ModbusRxBuf[11])) ? 1 : 0;
+        -:   13:    }
+        -:   14:
+        -:   15:    // Data enter check for FC  0x10
+       36:   16:    if (ModbusRxBuf[7] == 0x10)
+        -:   17:    {
+        6:   18:        add = (ModbusRxBuf[8] << 8) | ModbusRxBuf[9];
+        6:   19:        numRegisters = (ModbusRxBuf[10] << 8) | ModbusRxBuf[11];
+        -:   20:
+       21:   21:        for (increment = 0; increment < numRegisters; increment++)
+        -:   22:        {
+       15:   23:            receivedData = (ModbusRxBuf[13 + increment * 2] << 8) | ModbusRxBuf[14 + increment * 2];
+       15:   24:            test_c = (Dataregister[add + increment] != receivedData) ? 1 : 0;
+        -:   25:        }
+        -:   26:    }
+        -:   27:
+        -:   28:    // Data enter check for FC  0x05
+       36:   29:    if (ModbusRxBuf[7] == 0x05)
+        -:   30:    {
+        -:   31:
+        3:   32:        int reg = (ModbusRxBuf[9] - 1) / 16;
+        3:   33:        int bit = (ModbusRxBuf[9] - 1) % 16;
+        3:   34:        test_c = (Dataregister[reg] == COIL1[reg]) ? 1 : 0;
+        -:   35:        //printf("\n before -- %04x - %04x", Dataregister[reg], COIL1[reg]);
+        3:   36:        if(ModbusTxBuf[7] < 0x80){
+        1:   37:        if (ModbusRxBuf[10] == 0xff)
+        -:   38:        {
+        1:   39:            SET(COIL1[reg], bit);
+        -:   40:        }
+        -:   41:        else
+        -:   42:        {
+    #####:   43:            CLR(COIL1[reg], bit);
+        -:   44:        }
+        -:   45:        //printf("\n change -- %04x - %04x", Dataregister[reg], COIL1[reg]);
+        1:   46:        test_c = (Dataregister[reg] != COIL1[reg]) ? 1 : 0;
+        -:   47:        }
+        -:   48:        //printf("%d",test_c);
+        -:   49:    }
+        -:   50:
+       36:   51:    if (ModbusRxBuf[7] == 0x0f)
+        -:   52:    {
+        -:   53:        unsigned int bit_count, reg, regbit, a, b, d;
+        -:   54:        uint16_t c[25];
+        -:   55:
+       15:   56:        for (int i = 0; i < ModbusRxBuf[12]; i++)
+        -:   57:        {
+       12:   58:            c[i] = (ModbusRxBuf[(i * 2) + 14] << 8) | ModbusRxBuf[(i * 2) + 13];
+        -:   59:        }
+        -:   60:
+       63:   61:        for (bit_count = ModbusRxBuf[11] - 1; bit_count >= 0; bit_count--)
+        -:   62:        {
+      123:   63:            regbit = ((ModbusRxBuf[9] + bit_count) - 1) % 16;
+       63:   64:            reg = ((ModbusRxBuf[9] + bit_count) - 1) / 16;
+        -:   65:            //printf("\n before -- %04x - %04x", Dataregister[reg], COIL1[reg]);
+       63:   66:            a = bit_count % 16;
+       63:   67:            b = bit_count / 16;
+        -:   68:
+       63:   69:            d = GET_BIT(c[b], a);
+        -:   70:
+       63:   71:            if (d == 0x1)
+        -:   72:            {
+       34:   73:                SET(COIL1[reg], regbit);
+        -:   74:            }
+        -:   75:            else
+        -:   76:            {
+       29:   77:                CLR(COIL1[reg], regbit);
+        -:   78:            }
+       63:   79:            if (bit_count == 0)
+        -:   80:            {
+        3:   81:                break;
+        -:   82:            }
+        -:   83:        }
+        3:   84:        reg = ((ModbusRxBuf[9] + bit_count) - 1) / 16;
+        6:   85:        for (int i = reg; i <= reg + (ModbusRxBuf[12] / 2); i++)
+        -:   86:        {
+        -:   87:            //printf("\n change -- %04x--%04x  ", Dataregister[i], COIL1[i]);
+        5:   88:            if ((Dataregister[i] != COIL1[i]))
+        -:   89:            {
+        2:   90:                test_c = 1;
+        2:   91:                break;
+        -:   92:            }
+        -:   93:        }
+        -:   94:    }
+        -:   95:
+       36:   96:    numRegisters = (ModbusTxBuf[7] < 0x80) ? (0x06 + ModbusTxBuf[5]) : 0x09;
+        -:   97:    // send packet check for all function code
+      457:   98:    for (increment = 0; increment < numRegisters; increment++)
+        -:   99:    {
+        -:  100:        // Test_Res = (ModbusTxBuf[increment] != expec_TX[increment]) ? 0 : 1;
+      421:  101:        if ((ModbusTxBuf[increment] != expec_TX[increment]))
+        -:  102:        {
+    #####:  103:            Test_Res = 0;
+    #####:  104:            break; // Exit the loop or block
+        -:  105:        }
+        -:  106:    }
+        -:  107:
+       36:  108:    return Test_Res;
+        -:  109:}

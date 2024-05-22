@@ -1,0 +1,445 @@
+uint16_t Dataregister[150] = {
+    0x0304, 0x0554, 0x0AAB, 0x0C39, 0x0F7E, 0x0DE2, 0x0B6F, 0x0E3A, 0x089D, 0x0F48,
+    0x0910, 0x06A1, 0x0F1D, 0x002B, 0x0BBE, 0x0DCE, 0x081F, 0x0C7C, 0x06F2, 0x043F,
+    0x03E8, 0x0D4D, 0x008E, 0x0A88, 0x0C97, 0x0DA5, 0x0EF7, 0x06B2, 0x0E53, 0x0B81,
+    0x03D2, 0x00C5, 0x03E9, 0x02F6, 0x0B32, 0x0AFC, 0x0721, 0x0C80, 0x0415, 0x0E36,
+    0x06D8, 0x0E99, 0x0523, 0x0DA9, 0x032C, 0x0FF2, 0x07A3, 0x0BCD, 0x02A0, 0x05FE,
+    0x057D, 0x0839, 0x0DD7, 0x07C4, 0x09E1, 0x01AA, 0x09C6, 0x0A1F, 0x0798, 0x08A2,
+    0x0BFC, 0x0C3E, 0x08B4, 0x0EAB, 0x0586, 0x0B17, 0x0F9E, 0x0F6D, 0x0A55, 0x0DC4,
+    0x0FB3, 0x085D, 0x0AE9, 0x0C22, 0x0D61, 0x062A, 0x067B, 0x0C45, 0x0B60, 0x0493,
+    0x0FAA, 0x0D2B, 0x0EA8, 0x03B1, 0x07E0, 0x08E7, 0x0E65, 0x0C9C, 0x014F, 0x00D6,
+    0x040B, 0x01C8, 0x07B6, 0x0F3D, 0x037E, 0x0349, 0x0464, 0x0282, 0x09A7, 0x050F};
+
+
+******************************************************************************************
+
+Query Packet:1 - Function Error 
+Number of packets to send: 9
+00 01 00 02 00 06 03 09 00 07 00 06 
+Expected Response:
+00 01 00 02 00 03 03 89 01 
+Actual Response:
+00 01 00 02 00 03 03 89 01 
+ Test Passed
+
+*******************************************************************************************
+
+ReadCoilStatus
+Query Packet:2
+Number of packets to send: 11
+00 01 00 02 00 06 03 01 00 01 00 09 
+Expected Response:
+00 01 00 02 00 05 03 01 02 04 01 
+Actual Response:
+00 01 00 02 00 05 03 01 02 04 01 
+ Test Passed
+
+*******************************************************************************************
+
+ReadCoilStatus
+Query Packet:3
+Number of packets to send: 11
+00 01 00 02 00 06 03 01 00 11 00 09
+Expected Response:
+00 01 00 02 00 05 03 01 02 54 01
+Actual Response:
+00 01 00 02 00 05 03 01 02 54 01
+ Test Passed
+
+*******************************************************************************************
+
+ReadCoilStatus
+Query Packet:4 - Address Error
+Number of packets to send: 9
+00 01 00 02 00 06 03 01 01 51 00 09
+Expected Response:
+00 01 00 02 00 03 03 81 02
+Actual Response:
+00 01 00 02 00 03 03 81 02
+ Test Passed
+
+*******************************************************************************************
+
+ReadInputStatus
+Query Packet:5
+Number of packets to send: 10
+00 01 00 02 00 06 03 02 00 02 00 03
+Expected Response:
+00 01 00 02 00 04 03 02 01 02
+Actual Response:
+00 01 00 02 00 04 03 02 01 02
+ Test Passed
+
+*******************************************************************************************
+
+ReadInputStatus
+Query Packet:6
+Number of packets to send: 11
+00 01 00 02 00 06 03 02 00 18 00 0F
+Expected Response:
+00 01 00 02 00 05 03 02 02 0A 56
+Actual Response:
+00 01 00 02 00 05 03 02 02 0A 56
+ Test Passed
+
+*******************************************************************************************
+
+ReadInputStatus
+Query Packet:7 - Address Error
+Number of packets to send: 9
+00 01 00 02 00 06 03 02 01 56 00 03
+Expected Response:
+00 01 00 02 00 03 03 82 02
+Actual Response:
+00 01 00 02 00 03 03 82 02
+ Test Passed
+
+*******************************************************************************************
+
+ReadHolding
+Query Packet:8
+Number of packets to send: 15
+00 01 00 02 00 06 03 03 00 09 00 03
+Expected Response:
+00 01 00 02 00 09 03 03 06 0F 48 09 10 06 A1
+Actual Response:
+00 01 00 02 00 09 03 03 06 0F 48 09 10 06 A1
+ Test Passed
+
+*******************************************************************************************
+
+ReadHolding
+Query Packet:9 - Address Error
+Number of packets to send: 9
+00 01 00 02 00 06 03 03 00 7F 00 03
+Expected Response:
+00 01 00 02 00 03 03 83 02 
+Actual Response:
+00 01 00 02 00 03 03 83 02
+ Test Passed
+
+*******************************************************************************************
+
+ReadInputRegisters
+Query Packet:10
+Number of packets to send: 13
+00 01 00 02 00 06 03 04 00 06 00 02
+Expected Response:
+00 01 00 02 00 07 03 04 04 0B 6F 0E 3A
+Actual Response:
+00 01 00 02 00 07 03 04 04 0B 6F 0E 3A
+ Test Passed
+
+*******************************************************************************************
+
+ReadInputRegisters
+Query Packet:11 - Address Error
+Number of packets to send: 9
+00 01 00 02 00 06 03 04 00 8D 00 02
+Expected Response:
+00 01 00 02 00 03 03 84 02
+Actual Response:
+00 01 00 02 00 03 03 84 02
+ Test Passed
+
+*******************************************************************************************
+
+ForceSingleCoil
+Query Packet:12
+Number of packets to send: 12
+00 01 00 02 00 06 03 05 00 53 FF 00
+Expected Response:
+00 01 00 02 00 06 03 05 00 53 FF 00
+Actual Response:
+00 01 00 02 00 06 03 05 00 53 FF 00
+ Test Passed - Data Entered
+
+*******************************************************************************************
+
+ForceSingleCoil
+Query Packet:13 - Address Error
+Number of packets to send: 9
+00 01 00 02 00 06 03 05 01 03 FF 00
+Expected Response:
+00 01 00 02 00 03 03 85 02
+Actual Response:
+00 01 00 02 00 03 03 85 02
+ Test Passed - Data not Entered
+
+*******************************************************************************************
+
+ForceSingleCoil
+Query Packet:14 - Data Error
+Number of packets to send: 9
+00 01 00 02 00 06 03 05 00 07 FC 00
+Expected Response:
+00 01 00 02 00 03 03 85 03
+Actual Response:
+00 01 00 02 00 03 03 85 03 
+ Test Passed - Data not Entered
+
+*******************************************************************************************
+
+PresetSingle
+Query Packet:15
+Number of packets to send: 12
+00 01 00 02 00 06 03 06 00 03 03 04
+Expected Response:
+00 01 00 02 00 06 03 06 00 03 03 04
+Actual Response:
+00 01 00 02 00 06 03 06 00 03 03 04
+ Test Passed - Data Entered
+
+*******************************************************************************************
+
+ReadHolding
+Query Packet:16
+Number of packets to send: 11
+00 01 00 02 00 06 03 03 00 03 00 01
+Expected Response:
+00 01 00 02 00 05 03 03 02 0C 39
+Actual Response:
+00 01 00 02 00 05 03 03 02 0C 39
+ Test Passed
+
+*******************************************************************************************
+
+PresetSingle
+Query Packet:17 - Address Error
+Number of packets to send: 9
+00 01 00 02 00 06 03 06 00 8F 00 06
+Expected Response:
+00 01 00 02 00 03 03 86 02
+Actual Response:
+00 01 00 02 00 03 03 86 02
+ Test Passed - Data not Entered
+
+*******************************************************************************************
+
+PresetSingle
+Query Packet:18 - Data Error
+Number of packets to send: 9
+00 01 00 02 00 06 03 06 00 09 FF FF
+Expected Response:
+00 01 00 02 00 03 03 86 03
+Actual Response:
+00 01 00 02 00 03 03 86 03
+ Test Passed - Data not Entered
+
+*******************************************************************************************
+
+ForceMultipleCoils
+Query Packet:19
+Number of packets to send: 18
+00 01 00 02 00 0B 03 0F 00 01 00 15 04 CD 01 03 02
+Expected Response:
+00 01 00 02 00 06 03 0F 00 01 00 15
+Actual Response:
+00 01 00 02 00 06 03 0F 00 01 00 15
+ Test Passed - Data Entered
+
+*******************************************************************************************
+
+ForceMultipleCoils
+Query Packet:20 - Address Error
+Number of packets to send: 9
+00 01 00 02 00 0B 03 0F 01 55 00 15 04 CD 01 03 02
+Expected Response:
+00 01 00 02 00 03 03 8F 02
+Actual Response:
+00 01 00 02 00 03 03 8F 02
+ Test Passed - Data not Entered
+
+*******************************************************************************************
+
+ForceMultipleCoils
+Query Packet:21 - Data Error
+Number of packets to send: 18
+00 01 00 02 00 0B 03 0F 00 01 00 15 04 FF FF 03 02
+Expected Response:
+00 01 00 02 00 03 03 8F 03
+Actual Response:
+00 01 00 02 00 03 03 8F 03
+ Test Passed - Data not Entered
+
+*******************************************************************************************
+
+PresetMultiple
+Query Packet:22
+Number of packets to send: 18
+00 01 00 02 00 06 03 10 00 06 00 02 04 03 04 3C 7E
+Expected Response:
+00 01 00 02 00 06 03 10 00 06 00 02
+Actual Response:
+00 01 00 02 00 06 03 10 00 06 00 02
+ Test Passed - Data Entered
+
+*******************************************************************************************
+
+PresetMultiple
+Query Packet:23 - Address Error
+Number of packets to send: 9
+00 01 00 02 00 06 03 10 00 90 00 01 00 03
+Expected Response:
+00 01 00 02 00 03 03 90 02
+Actual Response:
+00 01 00 02 00 03 03 90 02
+ Test Passed - Data not Entered
+
+*******************************************************************************************
+
+PresetMultiple
+Query Packet:24 - Data Error
+Number of packets to send: 9
+00 01 00 02 00 06 03 10 00 0C 00 03 06 FF FF 06 05 06 05
+Expected Response:
+00 01 00 02 00 03 03 90 03
+Actual Response:
+00 01 00 02 00 03 03 90 03
+ Test Passed - Data not Entered
+
+*******************************************************************************************
+
+ReadHolding
+Query Packet:25
+Number of packets to send: 19
+03 04 00 00 00 06 01 03 00 02 00 05
+Expected Response:
+03 04 00 00 00 0D 01 03 0A 0A AB 0C 39 0F 7E 0D E2 0B 6F
+Actual Response:
+03 04 00 00 00 0D 01 03 0A 0A AB 0C 39 0F 7E 0D E2 0B 6F
+ Test Passed
+
+*******************************************************************************************
+
+ReadHolding
+Query Packet:26
+Number of packets to send: 19
+03 04 00 00 00 06 01 03 00 08 00 05
+Expected Response:
+03 04 00 00 00 0D 01 03 0A 08 9D 0F 48 09 10 06 A1 0F 1D
+Actual Response:
+03 04 00 00 00 0D 01 03 0A 08 9D 0F 48 09 10 06 A1 0F 1D
+ Test Passed
+
+*******************************************************************************************
+
+ReadHolding
+Query Packet:27
+Number of packets to send: 19
+03 04 00 00 00 06 01 03 00 06 00 05
+Expected Response:
+03 04 00 00 00 0D 01 03 0A 0B 6F 0E 3A 08 9D 0F 48 09 10
+Actual Response:
+03 04 00 00 00 0D 01 03 0A 0B 6F 0E 3A 08 9D 0F 48 09 10
+ Test Passed
+
+*******************************************************************************************
+
+PresetSingle
+Query Packet:28
+Number of packets to send: 12
+00 01 00 02 00 06 03 06 00 09 05 06
+Expected Response:
+00 01 00 02 00 06 03 06 00 09 05 06
+Actual Response:
+00 01 00 02 00 06 03 06 00 09 05 06
+ Test Passed - Data Entered
+
+*******************************************************************************************
+
+ReadHolding
+Query Packet:29
+Number of packets to send: 11
+00 01 00 02 00 06 03 03 00 09 00 01
+Expected Response:
+00 01 00 02 00 05 03 03 02 0F 48
+Actual Response:
+00 01 00 02 00 05 03 03 02 0F 48
+ Test Passed
+
+*******************************************************************************************
+
+PresetMultiple
+Query Packet:30
+Number of packets to send: 18
+00 01 00 02 00 06 03 10 00 30 00 03 06 00 53 06 05 06 05
+Expected Response:
+00 01 00 02 00 06 03 10 00 30 00 03
+Actual Response:
+00 01 00 02 00 06 03 10 00 30 00 03
+ Test Passed - Data Entered
+
+*******************************************************************************************
+
+ReadHolding
+Query Packet:31
+Number of packets to send: 15
+00 01 00 02 00 06 03 03 00 30 00 03
+Expected Response:
+00 01 00 02 00 09 03 03 06 02 A0 05 FE 05 7D
+Actual Response:
+00 01 00 02 00 09 03 03 06 02 A0 05 FE 05 7D
+ Test Passed
+
+*******************************************************************************************
+
+PresetSingle
+Query Packet:32
+Number of packets to send: 12
+00 01 00 02 00 06 03 06 00 23 25 75
+Expected Response:
+00 01 00 02 00 06 03 06 00 23 25 75
+Actual Response:
+00 01 00 02 00 06 03 06 00 23 25 75
+ Test Passed - Data Entered
+
+*******************************************************************************************
+
+PresetMultiple
+Query Packet:33
+Number of packets to send: 18
+00 01 00 02 00 06 03 10 00 32 00 03 06 00 53 09 05 77 05
+Expected Response:
+00 01 00 02 00 06 03 10 00 32 00 03
+Actual Response:
+00 01 00 02 00 06 03 10 00 32 00 03
+ Test Passed - Data Entered
+
+*******************************************************************************************
+
+PresetSingle
+Query Packet:34
+Number of packets to send: 12
+00 01 00 02 00 06 03 06 00 19 67 45
+Expected Response:
+00 01 00 02 00 06 03 06 00 19 67 45
+Actual Response:
+00 01 00 02 00 06 03 06 00 19 67 45
+ Test Passed - Data Entered
+
+*******************************************************************************************
+
+PresetMultiple
+Query Packet:35
+Number of packets to send: 18
+00 01 00 02 00 06 03 10 00 40 00 03 06 00 53 08 05 66 05
+Expected Response:
+00 01 00 02 00 06 03 10 00 40 00 03
+Actual Response:
+00 01 00 02 00 06 03 10 00 40 00 03 
+ Test Passed - Data Entered
+
+*******************************************************************************************
+
+ReadHolding
+Query Packet:36
+Number of packets to send: 19
+03 04 00 00 00 06 01 03 00 05 00 05
+Expected Response:
+03 04 00 00 00 0D 01 03 0A 0D E2 0B 6F 0E 3A 08 9D 0F 48
+Actual Response:
+03 04 00 00 00 0D 01 03 0A 0D E2 0B 6F 0E 3A 08 9D 0F 48
+ Test Passed
+
+*******************************************************************************************

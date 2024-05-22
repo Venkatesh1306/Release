@@ -1,0 +1,67 @@
+        -:    0:Source:Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/test/printfunc.c
+        -:    0:Programs:10
+        -:    1:#include "testhead.h"
+        -:    2:
+       19:    3:void printfunction()
+        -:    4:{
+        -:    5:   
+       19:    6:    switch (ModbusRxBuf[1])
+        -:    7:    {
+        -:    8:    case 0x03:
+        8:    9:        printf(ANSI_COLOR_BLUE "\nReadHolding");
+        8:   10:        break;
+        -:   11:    case 0x06:
+        4:   12:        printf(ANSI_COLOR_BLUE "\nPresetSingle");
+        4:   13:        break;
+        -:   14:    case 0x10:
+        6:   15:        printf(ANSI_COLOR_BLUE "\nPresetMultiple");
+        6:   16:        break;
+        -:   17:    }
+       19:   18:    printf(ANSI_COLOR_RESET "\nQuery Packet:%d", incrs + 1);
+       19:   19:    if (mbTxBuf[1] > 0x80)
+        -:   20:    {
+        6:   21:        switch (mbTxBuf[2])
+        -:   22:        {
+        -:   23:        case 1:
+        1:   24:            printf(ANSI_COLOR_ORANGE " - Function Error ");
+        1:   25:            break;
+        -:   26:        case 2:
+        3:   27:            printf(ANSI_COLOR_ORANGE " - Address Error ");
+        3:   28:            break;
+        -:   29:        case 3:
+        2:   30:            printf(ANSI_COLOR_ORANGE " - Data Error ");
+        2:   31:            break;
+        -:   32:        }
+        -:   33:    }
+        -:   34:
+        -:   35:#ifdef result
+        -:   36:
+       19:   37:    printf(ANSI_COLOR_RESET "\n");
+       19:   38:    printf("Number of packets to send: %d\n", ModbusTxLength);
+        -:   39:
+      261:   40:    for (int i = 0; i < ModbusRxBuftest[incrs][0]; i++)
+      242:   41:        printf("%02X ", ModbusRxBuf[i]);
+       19:   42:    printf("\n");
+        -:   43:
+       19:   44:    printf("Expected Response:\n");
+      217:   45:    for (int i = 0; i < textTxts[incrs][0]; i++)
+      198:   46:        printf("%02X ", testTxBuf[i]);
+       19:   47:    printf("\n");
+        -:   48:
+       19:   49:    printf("Actual Response:\n");
+       19:   50:    int responseLength = (mbTxBuf[1] == 0x06 || mbTxBuf[1] == 0x10 || mbTxBuf[1] == 0x05 || mbTxBuf[1] == 0x0f) ? 0x08 : ((mbTxBuf[1] < 0x80) ? 0x05 + mbTxBuf[2] : 0x05);
+      223:   51:    for (int i = 0; i < responseLength; i++)
+      204:   52:        printf("%02X ", mbTxBuf[i]);
+       19:   53:    printf("\n");
+        -:   54:
+        -:   55:#endif
+        -:   56:
+       19:   57:    printf(Test_Res == 1 ? ANSI_COLOR_GREEN "Test Passed" : ANSI_COLOR_RED "Test failed\n");
+        -:   58:
+       19:   59:    if (ModbusRxBuf[1] == 0x6 || ModbusRxBuf[1] == 0x10 || mbTxBuf[1] == 0x05 || ModbusRxBuf[1] == 0x0f)
+        -:   60:
+       10:   61:        printf(test_c == 1 ? ANSI_COLOR_RED " - Data not Entered" : ANSI_COLOR_GREEN " - Data Entered");
+        -:   62:
+       19:   63:    printf("\n");
+       19:   64:    printf(ANSI_COLOR_RESET); // Reset color to default
+       19:   65:}

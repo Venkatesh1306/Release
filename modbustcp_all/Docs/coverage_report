@@ -1,0 +1,61 @@
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/modbusTcpFrame.c'
+Lines executed:95.16% of 62
+Creating 'modbusTcpFrame.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/modbusTcpPacketParse.c'
+Lines executed:100.00% of 35
+Creating 'modbusTcpPacketParse.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/modbusTcpError.c'
+Lines executed:100.00% of 11
+Creating 'modbusTcpError.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/readHoldingReg.c'
+Lines executed:100.00% of 17
+Creating 'readHoldingReg.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/presetSingleReg.c'
+Lines executed:100.00% of 21
+Creating 'presetSingleReg.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/presetMultipleReg.c'
+Lines executed:100.00% of 26
+Creating 'presetMultipleReg.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/forceMultipleCoils.c'
+Lines executed:100.00% of 32
+Creating 'forceMultipleCoils.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/forceSingleCoil.c'
+Lines executed:95.83% of 24
+Creating 'forceSingleCoil.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/readInputReg.c'
+Lines executed:100.00% of 18
+Creating 'readInputReg.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/readCoilStatus.c'
+Lines executed:100.00% of 29
+Creating 'readCoilStatus.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/readInputStatus.c'
+Lines executed:100.00% of 29
+Creating 'readInputStatus.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/test/test.c'
+Lines executed:100.00% of 15
+Creating 'test.c.gcov'
+
+File '<built-in>'
+No executable lines
+Removing '<built-in>.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/test/compare.c'
+Lines executed:93.48% of 46
+Creating 'compare.c.gcov'
+
+File 'Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/test/printfunc.c'
+Lines executed:100.00% of 47
+Creating 'printfunc.c.gcov'
+
+Lines executed:98.30% of 412

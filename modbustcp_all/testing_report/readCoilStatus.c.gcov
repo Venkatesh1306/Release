@@ -1,0 +1,121 @@
+        -:    0:Source:Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/readCoilStatus.c
+        -:    0:Programs:14
+        -:    1:/* Basic bit manipulation macros
+        -:    2: *  No one should ever have to rewrite these
+        -:    3:
+        -:    4:* Set bit y (0-indexed) of x to '1' by generating a a mask with a '1' in the proper bit location and ORing x with the mask.
+        -:    5:
+        -:    6:#define SET(x,y) x |= (1 << y)
+        -:    7:
+        -:    8:* Set bit y (0-indexed) of x to '0' by generating a mask with a '0' in the y position and 1's elsewhere then ANDing the mask with x.
+        -:    9:
+        -:   10:#define CLEAR(x,y) x &= ~(1<< y)
+        -:   11:
+        -:   12:* Return '1' if the bit value at position y within x is '1' and '0' if it's 0 by ANDing x with a bit mask where the bit in y's position is '1' and '0' elsewhere and comparing it to all 0's.  Returns '1' in least significant bit position if the value of the bit is '1', '0' if it was '0'.
+        -:   13:
+        -:   14:#define READ(x,y) ((0u == (x & (1<<y)))?0u:1u)
+        -:   15:
+        -:   16:* Toggle bit y (0-index) of x to the inverse: '0' becomes '1', '1' becomes '0' by XORing x with a bitmask where the bit in position y is '1' and all others are '0'.
+        -:   17:
+        -:   18:#define TOGGLE(x,y) (x ^= (1<<y))
+        -:   19:
+        -:   20:READ COIL STATUS : Function Code - 01
+        -:   21:=================
+        -:   22:
+        -:   23:* Reads the ON/OFF status of discrete outputs (0X references, coils) in the slave
+        -:   24:
+        -:   25:* QUERY FRAME:
+        -:   26:
+        -:   27:
+        -:   28:| Transaction Identifier | Protocol Identifier | Length | Unit Identifier | Function Code | Starting Address |  	No of points	 |
+        -:   29:|------------------------|---------------------|--------|-----------------|---------------|------------------|-----------------------|
+        -:   30:|       2 bytes          |      2 bytes        |2 bytes |      1 byte     |     1 byte    |     2 bytes      |       2 bytes         |
+        -:   31:
+        -:   32:
+        -:   33:* RESPONSE FRAME :
+        -:   34:
+        -:   35:
+        -:   36:| Transaction Identifier | Protocol Identifier | Length | Unit Identifier | Function Code |    Byte Count	 |      	DATA		 |
+        -:   37:|------------------------|---------------------|--------|-----------------|---------------|------------------|-----------------------|
+        -:   38:|       2 bytes          |      2 bytes        |2 bytes |      1 byte     |     1 byte    |		1byte		 |	variable (n bytes)	 |
+        -:   39:
+        -:   40:* DataRegister = {0xffff, 0x0f0f, 0x0ff0, 0xF00F, 0xf000, 0x00f0, 0x0fff, 0xff00, 0x3A2B, 0x3c7e, 0x0302, 0xFFFF, 0x1123, 0x1321, 0x3A2B, 0x3c7e, 0x0065, 0x2217, 0x1123, 0x1321, 0x3A2B, 0x3c7e, 0x0065, 0x2217, 0x1123, 0x1321, 0x3A2B, 0x3c7e, 0x0065, 0x2217, 0x1123, 0x1321, 0x3A2B, 0x3c7e};
+        -:   41:
+        -:   42:* Input Frame  :{0x00, 0x01, 0x00, 0x02, 0x00, 0x06, 0x03, 0x01, 0x00, 0x01, 0x00, 0x09}
+        -:   43:* Output Frame :{0x00, 0x01, 0x00, 0x02, 0x00, 0x05, 0x03, 0x01, 0x02, 0xff, 0x01}
+        -:   44:
+        -:   45:
+        -:   46: */
+        -:   47:
+        -:   48:#include "modbusTcp.h"
+        -:   49:
+        -:   50:/* Declaration of macro function */
+        -:   51:#define SET(x, y) x |= (1 << y)
+        -:   52:#define READ(x, y) ((0u == (x & (1 << y))) ? 0u : 1u)
+        -:   53:
+        -:   54:uint16_t
+        2:   55:readCoilStatus(uint8_t *p_modbusTxBuf, const uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData) {
+        -:   56:    /* According to CppCheck, it is advised to declare the p_dataMemory as a pointer to constant
+        -:   57:     *  However, in this case, we are not declaring it as constant because it doesn't allow flexibility in modifying the data through the pointer when necessary.
+        -:   58:     */
+        -:   59:
+        -:   60:    /* local variable declaration */
+        2:   61:    unsigned int NoOfBits = 0, Regbit = 0, reg = 0, regTx = 0, byte_index = 0, bit_count = 0, wordOffset = 0, m = 0, RegbitTx = 0;
+        -:   62:    uint16_t Txtempbuf[MaxSizeTxtempbuf];
+       62:   63:    for (m = 0; m < MaxSizeTxtempbuf; m++) {
+       60:   64:        Txtempbuf[m] = 0; /* initializing all values of Txtempbuf[m] = 0 */
+        -:   65:    }
+        2:   66:    unsigned int byte_count = 0, limit = 0, coil_bit = 0;
+        -:   67:
+        -:   68:
+        2:   69:    p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
+        2:   70:    p_modbusTxBuf[1] = p_parseModbusTcpData->transactionID.v[0];
+        -:   71:
+        2:   72:    p_modbusTxBuf[2] = p_parseModbusTcpData->protocolID.v[1];
+        2:   73:    p_modbusTxBuf[3] = p_parseModbusTcpData->protocolID.v[0];
+        -:   74:
+        2:   75:    p_modbusTxBuf[4] = 0X0;
+        -:   76:
+        2:   77:    p_modbusTxBuf[6] = p_parseModbusTcpData->unitID;
+        2:   78:    p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
+        -:   79:
+        2:   80:    byte_count = (p_parseModbusTcpData->numberofRegister.Val / 0x8) + 1;
+        2:   81:    p_modbusTxBuf[8] = byte_count;
+        -:   82:
+        2:   83:    p_modbusTxBuf[5] = 0x03 + byte_count;
+        -:   84:
+        2:   85:    NoOfBits = p_parseModbusTcpData->numberofRegister.Val;
+        -:   86:
+        -:   87:    /*Ignored the CppCheck warning for variables reg, Regbit,RegbitTx,wordOffset and coil_bit  as they are assigned values but never used
+        -:   88:     * Regbit : Represents the bit position within a register,used in lines 97,102.
+        -:   89:     * reg: Indicates the register index, used in lines 98,102
+        -:   90:     * RegbitTx: Tracks the bit position for transmission,used in lines 99,103
+        -:   91:     * wordOffset: Represents the offset for word alignment used in lines 109,110,111
+        -:   92:     * coil_bit: Stores the value of the bit being read used in line 102,103.
+        -:   93:     */
+        -:   94:
+       20:   95:    for (bit_count = 0; bit_count < NoOfBits; bit_count++) /* byte count */ {
+        -:   96:
+        -:   97:
+       18:   98:        Regbit = (p_parseModbusTcpData->startAddress.Val + bit_count - 1) % 16; /* 20 - 1 % 16 = 4th bit */
+       18:   99:        reg = (p_parseModbusTcpData->startAddress.Val + bit_count - 1) / 16; /* 20 - 1 /16 = 1st  reg */
+       18:  100:        RegbitTx = (bit_count) % 16; /* 20 - 1 % 16 = 4th bit -- bit increment */
+       18:  101:        regTx = (bit_count) / 16; /* 20 - 1 /16 = 1st  reg -- register increment */
+        -:  102:
+       18:  103:        coil_bit = READ(p_dataMemory[reg], Regbit);
+       18:  104:        Txtempbuf[regTx] |= coil_bit << RegbitTx;
+        -:  105:    }
+        -:  106:
+        -:  107:
+        4:  108:    for (byte_index = 0; byte_index < (regTx + 1); byte_index++) {
+        -:  109:
+        -:  110:
+        2:  111:        wordOffset = byte_index * 2;
+        2:  112:        p_modbusTxBuf[9 + wordOffset] = (Txtempbuf[byte_index] % 0x100);
+        2:  113:        p_modbusTxBuf[10 + wordOffset] = (Txtempbuf[byte_index] / 0x100);
+        -:  114:    }
+        -:  115:
+        2:  116:    limit = p_modbusTxBuf[5] + 0x6;
+        2:  117:    return limit;
+        -:  118:
+        -:  119:}

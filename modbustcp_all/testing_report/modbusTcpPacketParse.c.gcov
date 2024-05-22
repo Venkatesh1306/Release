@@ -1,0 +1,103 @@
+        -:    0:Source:Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/modbusTcpPacketParse.c
+        -:    0:Programs:14
+        -:    1:/*
+        -:    2:Function name    : uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData, const uint8_t *p_modbusRxBuf)
+        -:    3: * Return Type   : Returns 0
+        -:    4: * Parameters    :
+        -:    5: *      p_modbusRxBuf        -  received input frame that contains message format of query from the client
+        -:    6: *      p_parseModbusTcpData -  p_parseModbusTcpData serves as a container for parsed data extracted from a received Modbus TCP packet
+        -:    7: * Description   :
+        -:    8: *      This function parses Modbus TCP packet data stored in p_modbusRxBuf and populates the fields of the mbPacketParse_t structure pointed to by p_parseModbusTcpData.
+        -:    9:        Depending on the function code extracted from the packet data, it handles single register or multiple register preset operations and Force single or multiple coils extracting the datas
+        -:   10:        and storing it appropriately in the structure.
+        -:   11: * Usage         :
+        -:   12: *      Example  -  modbusTcpParse (&p_parseModbusTcpData, p_modbusRxBuf);
+        -:   13: * Required      :  modbusTcpRxBuf
+        -:   14:*/
+        -:   15:
+        -:   16:#include "modbusTcp.h"
+        -:   17:
+        -:   18:/* Global declaration of variables*/
+        -:   19:unsigned int c2, d2, bytesrx;
+        -:   20:unsigned char exceptioncode;
+        -:   21:
+       36:   22:uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData, const uint8_t *p_modbusRxBuf)
+        -:   23:{
+        -:   24:  /* Parsing of Recieving buffer */
+       36:   25:  p_parseModbusTcpData->transactionID.v[1] = p_modbusRxBuf[0];
+       36:   26:  p_parseModbusTcpData->transactionID.v[0] = p_modbusRxBuf[1];
+        -:   27:
+       36:   28:  p_parseModbusTcpData->protocolID.v[1] = p_modbusRxBuf[2];
+       36:   29:  p_parseModbusTcpData->protocolID.v[0] = p_modbusRxBuf[3];
+        -:   30:
+       36:   31:  p_parseModbusTcpData->length = p_modbusRxBuf[5];
+        -:   32:
+       36:   33:  p_parseModbusTcpData->unitID = p_modbusRxBuf[6];
+        -:   34:
+       36:   35:  p_parseModbusTcpData->functionCode = p_modbusRxBuf[7];
+        -:   36:
+       36:   37:  p_parseModbusTcpData->startAddress.v[1] = p_modbusRxBuf[8];
+       36:   38:  p_parseModbusTcpData->startAddress.v[0] = p_modbusRxBuf[9];
+        -:   39:
+        -:   40:  /* Allocates data for PresetSingleRegister */
+       36:   41:  if (p_parseModbusTcpData->functionCode == PresetSingleRegister)
+        -:   42:  {
+        6:   43:    p_parseModbusTcpData->preset_Data.v[1] = p_modbusRxBuf[10];
+        6:   44:    p_parseModbusTcpData->preset_Data.v[0] = p_modbusRxBuf[11];
+        -:   45:  }
+        -:   46:
+        -:   47:  /* Allocates data for PresetMultipleRegister */
+       30:   48:  else if (p_parseModbusTcpData->functionCode == PresetMultipleRegisters)
+        -:   49:  {
+        -:   50:
+        6:   51:    p_parseModbusTcpData->numberofRegister.v[1] = p_modbusRxBuf[10];
+        6:   52:    p_parseModbusTcpData->numberofRegister.v[0] = p_modbusRxBuf[11];
+        -:   53:
+        6:   54:    p_parseModbusTcpData->byteCount = p_modbusRxBuf[12];
+        -:   55:
+        6:   56:    if (p_parseModbusTcpData->numberofRegister.Val < 0x7d) /* checks for overflow of data array size*/
+        -:   57:    {
+       21:   58:      for (c2 = 0; c2 < p_parseModbusTcpData->numberofRegister.Val; c2++)
+        -:   59:      {
+       15:   60:        d2 = c2 * 2;
+        -:   61:
+       15:   62:        p_parseModbusTcpData->data[c2].v[1] = p_modbusRxBuf[13 + d2];
+       15:   63:        p_parseModbusTcpData->data[c2].v[0] = p_modbusRxBuf[14 + d2];
+        -:   64:      }
+        -:   65:    }
+        -:   66:  }
+        -:   67:
+        -:   68:  /* Allocates data for ForceSingleCoil */
+       24:   69:  else if (p_parseModbusTcpData->functionCode == ForceSingleCoil)
+        -:   70:  {
+        3:   71:    p_parseModbusTcpData->forceData[0].v[1] = p_modbusRxBuf[10];
+        3:   72:    p_parseModbusTcpData->forceData[0].v[0] = p_modbusRxBuf[11];
+        -:   73:  }
+        -:   74:
+        -:   75:  /* Allocates data for ForceMultipleCoils */
+       21:   76:  else if (p_parseModbusTcpData->functionCode == ForceMultipleCoils)
+        -:   77:  {
+        3:   78:    p_parseModbusTcpData->numberofRegister.v[1] = p_modbusRxBuf[10];
+        3:   79:    p_parseModbusTcpData->numberofRegister.v[0] = p_modbusRxBuf[11];
+        -:   80:
+        3:   81:    p_parseModbusTcpData->byteCount = p_modbusRxBuf[12];
+        3:   82:    if (p_parseModbusTcpData->numberofRegister.Val <= MaxSizeCoilData) /* checks for overflow of coildata array size*/
+        -:   83:    {
+        9:   84:      for (c2 = 0; c2 < p_parseModbusTcpData->byteCount / 2; c2++)
+        -:   85:      {
+        -:   86:
+        6:   87:        p_parseModbusTcpData->coilData[c2] = (p_modbusRxBuf[14 + c2 * 2] << 8) | p_modbusRxBuf[13 + c2 * 2];
+        -:   88:      }
+        -:   89:    }
+        -:   90:  }
+        -:   91:
+        -:   92:  /* Allocates Number of registers for required functions */
+        -:   93:  else
+        -:   94:  {
+        -:   95:
+       18:   96:    p_parseModbusTcpData->numberofRegister.v[1] = p_modbusRxBuf[10];
+       18:   97:    p_parseModbusTcpData->numberofRegister.v[0] = p_modbusRxBuf[11];
+        -:   98:  }
+        -:   99:
+       36:  100:  return 0;
+        -:  101:}

@@ -1,0 +1,59 @@
+        -:    0:Source:Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/libModbusRtu/modbusRtuError.c
+        -:    0:Programs:10
+        -:    1:/*
+        -:    2:Function name : void modbusError(mbPacketParse_t *p_parseModbusRtuData, uint8_t *p_modbusTxBuf, unsigned char exceptioncode)
+        -:    3:Return Type   : None
+        -:    4:Parameters    :
+        -:    5:     *      p_modbusTxBuf         -  response frame that is sent to client from the server after processing the query frame
+        -:    6:     *      exceptioncode         -  error codes that are returned by a modbus slave device when it has detected a problem with a command that it received
+        -:    7:     *      p_parseModbusRtuData  -  contains the parsed data of the received query frame
+        -:    8:Description   :
+        -:    9: *      This function is called when the query message has detected a problem with a command . It receives the parsed data of the query message
+        -:   10:  and the exception code specific to the problem as input. It frames the exception response message to be transmitted to the client. The length of the reponse
+        -:   11:  frame is constant (9 bytes) for all exception codes.
+        -:   12:Usage         :
+        -:   13: *      Example - modbusError(&p_parseModbusRtuData, p_modbusTxBuf, Illegal_Data_Address);
+        -:   14:Required      :  exceptioncode,p_parseModbusRtuData
+        -:   15:
+        -:   16:QUERY FRAME:
+        -:   17:
+        -:   18:QUERY FRAME :
+        -:   19:
+        -:   20:|Slave Address |  Function Code   |   Starting Address (Hi)   |   Starting Address (Lo)   |   Quantity of Registers (Hi)  |   Quantity of Registers (Lo)  |   CRC (Cyclic Redundancy Check)|
+        -:   21:|--------------|------------------|---------------------------|---------------------------|-------------------------------|-------------------------------|--------------------------------|
+        -:   22:|    1 byte    |     1 byte       |         1 byte            |          1 byte           |            1 byte             |            1 byte             |     2 bytes                    |
+        -:   23:
+        -:   24:RESPONSE FRAME:
+        -:   25:
+        -:   26:|Slave Address |  Function Code   | Exception Code      |   CRC (Cyclic Redundancy Check)|
+        -:   27:|--------------|------------------|---------------------|--------------------------------| - 5 bytes
+        -:   28:|    1 byte    |     1 byte       |   1 byte            |           2 bytes              |
+        -:   29:
+        -:   30:FUNCTION CODE ERROR:(0X01)
+        -:   31: * INPUT FRAME  = {0x10, 0x09, 0x00, 0x06, 0x00, 0x03, 0x7E, 0x8A};
+        -:   32: * The function code specifief in the query is not recognized or supported by the server (i.e the function code (0x09) is invalid).
+        -:   33: * RESPONSE FRAME = {0x10, 0x89, 0x1, 0xD6, 0X55};
+        -:   34:
+        -:   35:ADDRESS ERROR:(0X02)
+        -:   36: * INPUT FRAME  = {0x10, 0x03, 0x00, 0x64, 0x00, 0x1E, 0x87, 0x5C}
+        -:   37: * The  Starting Address size should not exceed DataRegistersize.
+        -:   38: * RESPONSE FRAME = {0x10, 0x83, 0x2, 0x90, 0xF4}
+        -:   39:
+        -:   40: DATA ERROR:(0X03) -- for Function code - 0x06 and 0x10:
+        -:   41: * INPUT FRAME  = {0x11, 0x06, 0x00, 0x01, 0xFD, 0xE8, 0x9A, 0x44};
+        -:   42: * The data value should not exceed the maximum allowed value of 65000(0xFDE8) for the Modbus Data Registers. Here the Data to be entered is invalid.
+        -:   43: * RESPONSE FRAME = {0x11, 0x86, 0x3, 0x3, 0xA4}
+        -:   44: */
+        -:   45:
+        -:   46:#include "modbusRtu.h"
+        -:   47:
+        6:   48:void modbusError(mbPacketParse_t *p_parseModbusRtuData, uint8_t *p_modbusTxBuf, unsigned char exceptioncode)
+        -:   49:{
+        -:   50:  /* Assigning values for modbustx buffer */
+        6:   51:  p_modbusTxBuf[0] = p_parseModbusRtuData->slave_addr.Val;
+        6:   52:  p_modbusTxBuf[1] = p_parseModbusRtuData->functionCode;
+        6:   53:  p_modbusTxBuf[2] = exceptioncode;
+        6:   54:  p_parseModbusRtuData->crc.Val = generateCRC(&p_modbusTxBuf[0], 3);
+        6:   55:  p_modbusTxBuf[3] = p_parseModbusRtuData->crc.bytes.LB;
+        6:   56:  p_modbusTxBuf[4] = p_parseModbusRtuData->crc.bytes.HB;
+        6:   57:}

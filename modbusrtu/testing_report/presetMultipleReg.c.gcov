@@ -1,0 +1,77 @@
+        -:    0:Source:Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/libModbusRtu/presetMultipleReg.c
+        -:    0:Programs:10
+        -:    1:/*
+        -:    2:
+        -:    3:QUERY FRAME :
+        -:    4:
+        -:    5:| Slave Address | Function Code | Starting Address (Hi)  |  Starting Address (Lo) | Quantity of Registers (Hi)  | Quantity of Registers (Lo)  | Byte Count  | Preset (register values)  | CRC (Cyclic Redundancy Check)  |
+        -:    6:|---------------|---------------|------------------------|------------------------|-----------------------------|-----------------------------|-------------|---------------------------|--------------------------------|
+        -:    7:|     1 byte    |    1 byte     |        1 byte          |        1 byte          |           1 byte            |           1 byte            |   1 byte    |     Variable              |           2 bytes              |
+        -:    8:
+        -:    9:RESPONSE FRAME :
+        -:   10:
+        -:   11:| Slave Address | Function Code | Starting Address (Hi)  | Starting Address (Lo)  | Quantity of Registers (Hi)  | Quantity of Registers (Lo)  | CRC (Cyclic Redundancy Check)  |
+        -:   12:|---------------|---------------|------------------------|------------------------|-----------------------------|-----------------------------|--------------------------------|
+        -:   13:|     1 byte    |    1 byte     |        1 byte          |        1 byte          |           1 byte            |           1 byte            |           2 bytes              |
+        -:   14:
+        -:   15:FUNCTION CODE - 0x10
+        -:   16:
+        -:   17:EXAMPLE :
+        -:   18:*INPUT FRAME = {0x11,0x10,0x00,0x01,0x00,0x02,0x04,0x00,0x02,0x03,0x09,0x07,0x95}
+        -:   19:*DATA REGISTER = {0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x0009, 0x0008, 0x0007, 0x0007, 0x0006, 0x0005, 0x0004, 0x0003, 0x0002, 0x0001, 0x0025, 0x0035, 0x0036, 0x9957, 0x7890} ;
+        -:   20:
+        -:   21:The query message specifies the register references to be preset. Registers are addressed starting at zero: register 1 is addressed as 0.
+        -:   22:The requested preset values are specified in the query data field.
+        -:   23:After Presetting,
+        -:   24:DATA REGISTER = {0x0000, 0x0002, 0x0309, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x0009, 0x0008, 0x0007, 0x0007, 0x0006, 0x0005, 0x0004, 0x0003, 0x0002, 0x0001, 0x0025, 0x0035, 0x0036, 0x9957, 0x7890} ;
+        -:   25:
+        -:   26:*RESPONSE FRAME = {0x11,0x10,0x00,0x01,0x00,0x02,0x12,0x98}
+        -:   27:
+        -:   28:*/
+        -:   29:
+        -:   30:#include "modbusRtu.h"
+        -:   31:
+        5:   32:uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusRtuData)
+        -:   33:{
+        -:   34:    /* Local variable Declaration */
+        5:   35:    uint16_t length = 0;
+        5:   36:    unsigned int limit = 0;
+        -:   37:
+        -:   38:    /* Assigning values for modbustx buffer */
+        5:   39:    p_modbusTxBuf[0] = p_parseModbusRtuData->slave_addr.Val;
+        5:   40:    p_modbusTxBuf[1] = p_parseModbusRtuData->functionCode;
+        -:   41:
+       45:   42:    for (limit = 0; limit < p_parseModbusRtuData->numberofRegister.v[0]; limit++)
+        -:   43:    {
+       40:   44:        if (p_parseModbusRtuData->data[limit].Val >= 65000)
+        -:   45:        {
+        -:   46:
+        1:   47:            p_parseModbusRtuData->functionCode = p_parseModbusRtuData->functionCode + 0x80;
+        1:   48:            modbusError(p_parseModbusRtuData, p_modbusTxBuf, Illegal_Data_Value); /* Data error */
+        1:   49:            limit = p_parseModbusRtuData->numberofRegister.v[0] + 1;
+        1:   50:            length = 0X03;
+        -:   51:        }
+        -:   52:        else
+        -:   53:        {
+       39:   54:            p_dataMemory[p_parseModbusRtuData->startAddress.Val + limit] = p_parseModbusRtuData->data[limit].v[0] + (p_parseModbusRtuData->data[limit].v[1] * 0x100);
+        -:   55:        }
+        -:   56:    }
+        5:   57:    if (p_parseModbusRtuData->functionCode == 0x10)
+        -:   58:    {
+        -:   59:        /* Assigning values for modbustx buffer */
+        4:   60:        p_modbusTxBuf[2] = p_parseModbusRtuData->startAddress.v[1];
+        4:   61:        p_modbusTxBuf[3] = p_parseModbusRtuData->startAddress.v[0];
+        4:   62:        p_modbusTxBuf[4] = p_parseModbusRtuData->numberofRegister.v[1];
+        4:   63:        p_modbusTxBuf[5] = p_parseModbusRtuData->numberofRegister.v[0];
+        -:   64:
+        4:   65:        p_parseModbusRtuData->crc.Val = generateCRC(&p_modbusTxBuf[0], 6);
+        -:   66:
+        4:   67:        p_modbusTxBuf[6] = p_parseModbusRtuData->crc.bytes.LB;
+        -:   68:
+        4:   69:        p_modbusTxBuf[7] = p_parseModbusRtuData->crc.bytes.HB;
+        -:   70:
+        4:   71:        length = 0x08;
+        -:   72:    }
+        -:   73:
+        5:   74:    return length;
+        -:   75:}

@@ -1,0 +1,75 @@
+        -:    0:Source:Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/forceSingleCoil.c
+        -:    0:Programs:14
+        -:    1:/* Force Single Coil - Function Code - 05
+        -:    2: *  The query message specifies the coil reference to be forced
+        -:    3: * A value of FF 00 hex requests the coil to be ON.
+        -:    4: * A value of 00 00 requests it to be OFF.
+        -:    5: *  All other values are illegal and will not affect the coil.
+        -:    6: *
+        -:    7: * QUERY FRAME:
+        -:    8:| Transaction Identifier | Protocol Identifier | Length | Unit Identifier | Function Code | Coil Address |   Force Data Value     |
+        -:    9:|------------------------|---------------------|--------|-----------------|---------------|--------------|------------------------|
+        -:   10:|       2 bytes          |      2 bytes        |2 bytes |      1 byte     |     1 byte    |    2 bytes   |           2 bytes      |
+        -:   11:
+        -:   12:RESPONSE FRAME:
+        -:   13:| Transaction Identifier | Protocol Identifier | Length | Unit Identifier | Function Code | Coil Address |     Force Data Value   |
+        -:   14:|------------------------|---------------------|--------|-----------------|---------------|--------------|------------------------|
+        -:   15:|       2 bytes          |      2 bytes        |2 bytes |      1 byte     |     1 byte    |    2 bytes   |         2 bytes        |
+        -:   16: *
+        -:   17: * INPUT FRAME    = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x10, 0x05, 0x00, 0xAC, 0xFF, 0x00}
+        -:   18: * RESPONSE FRAME = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x10, 0x05, 0x00, 0xAC, 0xFF, 0x00}
+        -:   19: */
+        -:   20:
+        -:   21:#include "modbusTcp.h"
+        -:   22:
+        -:   23:/* Macro definitions */
+        -:   24:#define SET(x, y) x |= (1 << y)
+        -:   25:#define READ(x, y) ((0u == (x & (1 << y))) ? 0u : 1u)
+        -:   26:#define CLEAR(x, y) x &= ~(1 << y)
+        -:   27:
+        2:   28:uint16_t forceSingleCoil(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData)
+        -:   29:{
+        -:   30:    /* Declaration of local variables*/
+        2:   31:    unsigned int length = 0, Regbit = 0, reg = 0;
+        -:   32:
+        -:   33:    /* Assigning values for transmitting buffer*/
+        2:   34:    p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
+        2:   35:    p_modbusTxBuf[1] = p_parseModbusTcpData->transactionID.v[0];
+        -:   36:
+        2:   37:    p_modbusTxBuf[2] = p_parseModbusTcpData->protocolID.v[1];
+        2:   38:    p_modbusTxBuf[3] = p_parseModbusTcpData->protocolID.v[0];
+        -:   39:
+        2:   40:    p_modbusTxBuf[4] = 0X0;
+        2:   41:    p_modbusTxBuf[5] = p_parseModbusTcpData->length;
+        2:   42:    p_modbusTxBuf[6] = p_parseModbusTcpData->unitID;
+        2:   43:    p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
+        -:   44:
+        2:   45:    p_modbusTxBuf[8] = p_parseModbusTcpData->startAddress.v[1]; /* coil address Hi */
+        2:   46:    p_modbusTxBuf[9] = p_parseModbusTcpData->startAddress.v[0]; /* coil address Lo */
+        -:   47:
+        2:   48:    p_modbusTxBuf[10] = p_parseModbusTcpData->forceData[0].v[1]; /* Force data Hi (FF/00) */
+        2:   49:    p_modbusTxBuf[11] = p_parseModbusTcpData->forceData[0].v[0]; /* Force data Lo (00) */
+        -:   50:
+        2:   51:    Regbit = (p_parseModbusTcpData->startAddress.Val - 1) % 16; /* 20 - 1 % 16 = 4th bit */
+        2:   52:    reg = (p_parseModbusTcpData->startAddress.Val - 1) / 16;    /* 20 - 1 /16 = 1st  reg */
+        -:   53:
+        2:   54:    if ((p_parseModbusTcpData->forceData[0].Val == 0xff00) || (p_parseModbusTcpData->forceData[0].Val == 0x0000)) /*checks for illegal data*/
+        -:   55:    {
+        2:   56:        if (p_parseModbusTcpData->forceData[0].Val == 0xFF00)
+        -:   57:        {
+        1:   58:            SET(p_dataMemory[reg], Regbit);
+        -:   59:        }
+        -:   60:        else
+        -:   61:        {
+    #####:   62:            CLEAR(p_dataMemory[reg], Regbit);
+        -:   63:        }
+        -:   64:    }
+        -:   65:    else
+        -:   66:    {
+        1:   67:        p_parseModbusTcpData->functionCode = p_parseModbusTcpData->functionCode + 0x80;
+        1:   68:        modbusError(p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Value);
+        -:   69:    }
+        -:   70:
+        2:   71:    length = 0x6 + p_modbusTxBuf[5];
+        2:   72:    return length;
+        -:   73:}

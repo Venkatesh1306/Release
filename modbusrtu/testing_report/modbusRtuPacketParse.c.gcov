@@ -1,0 +1,61 @@
+        -:    0:Source:Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/libModbusRtu/modbusRtuPacketParse.c
+        -:    0:Programs:10
+        -:    1:/*
+        -:    2:Function name    : uint16_t modbusRtuParse(mbPacketParse_t *p_parseModbusRtuData, const uint8_t *p_modbusRxBuf)
+        -:    3: * Return Type   : Returns 0
+        -:    4: * Parameters    :
+        -:    5: *      p_modbusRxBuf        -  received input frame that contains message format of query from the client
+        -:    6: *      p_parseModbusRtuData -  p_parseModbusRtuData serves as a container for parsed data extracted from a received Modbus Rtu packet
+        -:    7: * Description   :
+        -:    8: *      This function parses Modbus Rtu packet data stored in p_modbusRxBuf and populates the fields of the mbPacketParse_t structure pointed to by p_parseModbusRtuData.
+        -:    9:        Depending on the function code extracted from the packet data, it handles either single register or multiple register preset operations, extracting relevant information
+        -:   10:        and storing it appropriately in the structure.
+        -:   11: * Usage         :
+        -:   12: *      Example  -  modbusRtuParse (&p_parseModbusRtuData, p_modbusRxBuf);
+        -:   13: * Required      :  modbusRtuRxBuf
+        -:   14:*/
+        -:   15:
+        -:   16:#include "modbusRtu.h"
+        -:   17:
+        -:   18:/* Global variable Declaration */
+        -:   19:unsigned int c2, d2, bytesrx;
+        -:   20:unsigned char exceptioncode;
+        -:   21:
+       18:   22:uint16_t modbusRtuParse(mbPacketParse_t *p_parseModbusRtuData, const uint8_t *p_modbusRxBuf)
+        -:   23:{
+        -:   24:    /* Parsing the recived buffer */
+       18:   25:    p_parseModbusRtuData->slave_addr.Val = p_modbusRxBuf[0];
+        -:   26:
+       18:   27:    p_parseModbusRtuData->functionCode = p_modbusRxBuf[1];
+        -:   28:
+       18:   29:    p_parseModbusRtuData->startAddress.v[1] = p_modbusRxBuf[2];
+       18:   30:    p_parseModbusRtuData->startAddress.v[0] = p_modbusRxBuf[3];
+        -:   31:
+       18:   32:    if (p_parseModbusRtuData->functionCode == PresetSingleRegister)
+        -:   33:    {
+        4:   34:        p_parseModbusRtuData->preset_Data.v[1] = p_modbusRxBuf[4];
+        4:   35:        p_parseModbusRtuData->preset_Data.v[0] = p_modbusRxBuf[5]; /* Data for preset value for single register */
+        -:   36:    }
+       14:   37:    else if (p_parseModbusRtuData->functionCode == PresetMultipleRegisters)
+        -:   38:    {
+        -:   39:
+        6:   40:        p_parseModbusRtuData->numberofRegister.v[1] = p_modbusRxBuf[4];
+        6:   41:        p_parseModbusRtuData->numberofRegister.v[0] = p_modbusRxBuf[5];
+        6:   42:        p_parseModbusRtuData->byteCount = p_modbusRxBuf[6];
+        -:   43:
+       48:   44:        for (c2 = 0; c2 < p_parseModbusRtuData->numberofRegister.Val; c2++)
+        -:   45:        {
+        -:   46:
+       42:   47:            d2 = c2 * 2;
+       42:   48:            p_parseModbusRtuData->data[c2].v[1] = p_modbusRxBuf[7 + d2];
+       42:   49:            p_parseModbusRtuData->data[c2].v[0] = p_modbusRxBuf[8 + d2]; /* Data for preset value for multiple register */
+        -:   50:        }
+        -:   51:    }
+        -:   52:    else
+        -:   53:    {
+        8:   54:        p_parseModbusRtuData->numberofRegister.v[1] = p_modbusRxBuf[4];
+        8:   55:        p_parseModbusRtuData->numberofRegister.v[0] = p_modbusRxBuf[5];
+        -:   56:    }
+        -:   57:
+       18:   58:    return 0;
+        -:   59:}

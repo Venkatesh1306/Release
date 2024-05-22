@@ -1,0 +1,93 @@
+        -:    0:Source:Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/libModbusRtu/modbusRtuFrame.c
+        -:    0:Programs:10
+        -:    1:/*
+        -:    2:Function name : uint16_t modbusRtuFrame(const uint8_t *p_modbusRxBuf, uint16_t *p_dataMemory, uint8_t *p_modbusTxBuf, uint16_t *modBusframeLength)
+        -:    3: * Return Type   : Returns the modBusframeLength i.e the length of the frame to be transmitted.
+        -:    4: * Parameters    :
+        -:    5: *      p_modbusRxBuf      -  received input frame that contains message format of query from the client
+        -:    6: *      p_modbusTxBuf      -  response frame that is sent to client from the server after processing the query frame
+        -:    7: *      p_dataMemory       -  memory register to configure,monitor, and control device I/O
+        -:    8: *      modBusframeLength  -  the length of the Modbus Transmission frame i.e response frame
+        -:    9: * Description   :
+        -:   10: *      This function receives the query message and the Datamemory from the client. It processes the query frame
+        -:   11: * by parsing and checks for errors. If no error is detected , it frames the response message to be transmitted to the client.
+        -:   12: * Usage         :
+        -:   13: *      Example - modbusTxframeLength = modbusRtuFrame (&modbusRtuRxBuf[0], &dataMemory[0], &modbusRtuTxBuf[0],modBusframeLength);
+        -:   14: * Required      :  modbusRtuRxBuf,dataMemory
+        -:   15: * Error Handling: This function checks for the modbus exception cases in the query message and provide response
+        -:   16: * according to the nature of the error and exception code.
+        -:   17:*/
+        -:   18:
+        -:   19:#include "modbusRtu.h"
+        -:   20:mbPacketParse_t p_parseModbusRtuData;
+        -:   21:
+       19:   22:uint16_t modbusRtuFrame(const uint8_t *p_modbusRxBuf, uint16_t *p_dataMemory, uint8_t *p_modbusTxBuf, uint16_t *modBusframeLength)
+        -:   23:{
+       19:   24:    p_parseModbusRtuData.slave_addr.Val = p_modbusRxBuf[0];
+       19:   25:    if (0x11 == p_parseModbusRtuData.slave_addr.Val) /* checks the slave address */
+        -:   26:    {
+        -:   27:        /* local variable declaration */
+       18:   28:        uint16_t check = 0;
+       18:   29:        unsigned int preMultiLength = 0;
+        -:   30:
+        -:   31:        /* Parse Function */
+       18:   32:        modbusRtuParse(&p_parseModbusRtuData, p_modbusRxBuf);
+        -:   33:
+       36:   34:        if (!(p_parseModbusRtuData.functionCode == ReadHoldingRegister ||
+       11:   35:              p_parseModbusRtuData.functionCode == PresetSingleRegister ||
+        7:   36:              p_parseModbusRtuData.functionCode == PresetMultipleRegisters)) /* checks for function error */
+        -:   37:        {
+        1:   38:            p_parseModbusRtuData.functionCode = p_parseModbusRtuData.functionCode + 0x80;
+        1:   39:            modbusError(&p_parseModbusRtuData, p_modbusTxBuf, Illegal_Function_Code);
+        1:   40:            *modBusframeLength = 0x05;
+        -:   41:        }
+       27:   42:        else if (p_parseModbusRtuData.functionCode == ReadHoldingRegister ||
+       10:   43:                 p_parseModbusRtuData.functionCode == PresetMultipleRegisters) /* checks for address error */
+        -:   44:        {
+       37:   45:            if ((p_parseModbusRtuData.startAddress.Val > (int)(DataRegistersize)) ||
+       11:   46:                ((p_parseModbusRtuData.startAddress.Val + p_parseModbusRtuData.numberofRegister.Val) > (int)(DataRegistersize)))
+        -:   47:            {
+        2:   48:                p_parseModbusRtuData.functionCode = p_parseModbusRtuData.functionCode + 0x80;
+        2:   49:                modbusError(&p_parseModbusRtuData, p_modbusTxBuf, Illegal_Data_Address);
+        2:   50:                *modBusframeLength = 0x05;
+        -:   51:            }
+        -:   52:        }
+        4:   53:        else if (p_parseModbusRtuData.functionCode == PresetSingleRegister) /* checks for address error */
+        -:   54:        {
+        4:   55:            if (p_parseModbusRtuData.startAddress.Val > (int)(DataRegistersize))
+        -:   56:            {
+        1:   57:                p_parseModbusRtuData.functionCode = p_parseModbusRtuData.functionCode + 0x80;
+        1:   58:                modbusError(&p_parseModbusRtuData, p_modbusTxBuf, Illegal_Data_Address);
+        1:   59:                *modBusframeLength = 0x05;
+        -:   60:            }
+        -:   61:        }
+        -:   62:
+       18:   63:        preMultiLength = (p_parseModbusRtuData.functionCode != 0x10) ? 8 : (9 + p_parseModbusRtuData.byteCount); /* length for checkcrc of modbusrxbuf */
+       18:   64:        check = checkCRC(&p_modbusRxBuf[0], preMultiLength);
+       18:   65:        if (1 == check)
+        -:   66:        {
+       17:   67:            switch (p_parseModbusRtuData.functionCode)
+        -:   68:            {
+        -:   69:            case ReadHoldingRegister:
+        6:   70:                *modBusframeLength = readHoldingRegisters(p_modbusTxBuf, p_dataMemory, &p_parseModbusRtuData);
+        6:   71:                break;
+        -:   72:
+        -:   73:            case PresetSingleRegister:
+        3:   74:                *modBusframeLength = presetSingleRegisters(p_modbusTxBuf, p_dataMemory, &p_parseModbusRtuData);
+        3:   75:                break;
+        -:   76:
+        -:   77:            case PresetMultipleRegisters:
+        5:   78:                *modBusframeLength = presetMultipleRegisters(p_modbusTxBuf, p_dataMemory, &p_parseModbusRtuData);
+        5:   79:                break;
+        -:   80:
+        -:   81:            default:
+        3:   82:                break;
+        -:   83:            }
+        -:   84:        }
+       18:   85:        return *modBusframeLength;
+        -:   86:    }
+        -:   87:    else
+        -:   88:    {
+        1:   89:        return 0;
+        -:   90:    }
+        -:   91:}

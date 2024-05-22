@@ -1,0 +1,44 @@
+        -:    0:Source:Z:/On_testing/modbustcp/Sample_Mobus_t.X/test/compare.c
+        -:    0:Programs:9
+        -:    1:#include "testhead.h"
+        -:    2:// function for testing the output with the expected output
+       18:    3:uint16_t Test_ing(const uint8_t ModbusTxBuf[], const uint8_t Test_tx[])
+        -:    4:{
+        -:    5:
+       18:    6:    Test_Res = 1;
+        -:    7:
+       18:    8:    numRegisters = (ModbusTxBuf[7] < 0x80) ? (0x09 + ModbusTxBuf[8]) : 0x09;
+        -:    9:    // send packet check for all function code
+      238:   10:    for (increment = 0; increment < numRegisters; increment++)
+        -:   11:    {
+      220:   12:        if ((ModbusTxBuf[increment] != Test_tx[increment]))
+        -:   13:        {
+    #####:   14:            Test_Res = 0;
+    #####:   15:            break; // Exit the loop or block
+        -:   16:        }
+        -:   17:    }
+        -:   18:
+       18:   19:   testcheck = 0;
+        -:   20:
+        -:   21:    // Data enter check for FC 0x06
+       18:   22:    if (ModbusRxBuf[7] == 0x06)
+        -:   23:    {
+        5:   24:        add = (ModbusRxBuf[8] << 8) | ModbusRxBuf[9];
+        5:   25:       testcheck = (Dataregister[add] != ((ModbusRxBuf[10] << 8) | ModbusRxBuf[11])) ? 1 : 0;
+        -:   26:    }
+        -:   27:
+        -:   28:    // Data enter check for FC  0x10
+       18:   29:    if (ModbusRxBuf[7] == 0x10)
+        -:   30:    {
+        5:   31:        add = (ModbusRxBuf[8] << 8) | ModbusRxBuf[9];
+        5:   32:        numRegisters = (ModbusRxBuf[10] << 8) | ModbusRxBuf[11];
+        -:   33:
+       18:   34:        for (increment = 0; increment < numRegisters; increment++)
+        -:   35:        {
+       13:   36:            receivedData = (ModbusRxBuf[13 + increment * 2] << 8) | ModbusRxBuf[14 + increment * 2];
+       13:   37:           testcheck = (Dataregister[add + increment] != receivedData) ? 1 : 0;
+        -:   38:        }
+        -:   39:    }
+        -:   40:
+       18:   41:    return Test_Res;
+        -:   42:}

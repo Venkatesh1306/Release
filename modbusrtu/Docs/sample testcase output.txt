@@ -1,0 +1,240 @@
+uint16_t Dataregister[100] = {
+    0x1522, 0x2434, 0x3AAB, 0x4F6C, 0x6B81, 0x70D9, 0x8E2E, 0x9D07, 0xA1FA, 0xB0B5,
+    0xC543, 0xD68E, 0xE99B, 0xFCE4, 0x1D32, 0x2E9F, 0x33C8, 0x40E7, 0x53AD, 0x64F1,
+    0x78B6, 0x899C, 0x9A73, 0xABBE, 0xBC5A, 0xCF94, 0xD9E5, 0xEA47, 0xFB1B, 0x0D82,
+    0x1F67, 0x26B0, 0x35DD, 0x47A6, 0x5829, 0x69EC, 0x7C11, 0x8D09, 0x9E84, 0xAF56,
+    0xB80D, 0xC9C3, 0xD4FE, 0xE785, 0xF65A, 0x1573, 0x2A8E, 0x3B11, 0x4CCD, 0x5D35,
+    0x6E6A, 0x7D14, 0x8CF8, 0x9F65, 0xAE1B, 0xBF9E, 0xCCBB, 0xD9AA, 0xE884, 0xF950,
+    0x0DAA, 0x1E75, 0x25D6, 0x3433, 0x46BD, 0x5740, 0x6A0E, 0x7B8F, 0x8F4A, 0x9E93,
+    0xA5F8, 0xB438, 0xC583, 0xD64F, 0xE729, 0xF890, 0x1AB7, 0x2D58, 0x38D4, 0x4919,
+    0x5AFC, 0x6D2E, 0x7C61, 0x8DCA, 0x9EA5, 0xAF4B, 0xBE36, 0xCFDA, 0xDC1F, 0xEDC0,
+    0xFC1B, 0x0E0D, 0x1DAA, 0x2A05, 0x3BDF, 0x4C79, 0x5D96, 0x6E6C, 0x7F92, 0x8F1B};
+
+**************************************************
+
+Query Packet:1 - Function Error 
+Number of packets to send: 5
+11 09 00 02 00 02 FF 5A 
+Expected Response:
+11 89 01 87 95 
+Actual Response:
+11 89 01 87 95 
+Test Passed
+
+**************************************************
+
+ReadHolding
+Query Packet:2
+Number of packets to send: 9
+11 03 00 04 00 02 87 5A 
+Expected Response:
+11 03 04 6B 81 70 D9 43 A4 
+Actual Response:
+11 03 04 6B 81 70 D9 43 A4 
+Test Passed
+
+**************************************************
+
+ReadHolding
+Query Packet:3
+Number of packets to send: 9
+11 03 00 02 00 02 67 5B 
+Expected Response:
+11 03 04 3A AB 4F 6C A2 D7 
+Actual Response:
+11 03 04 3A AB 4F 6C A2 D7
+Test Passed
+
+**************************************************
+
+ReadHolding
+Query Packet:4 - Address Error
+Number of packets to send: 5
+11 03 00 7F 00 02 F7 43
+Expected Response:
+11 83 02 C1 34
+Actual Response:
+11 83 02 C1 34
+Test Passed
+
+**************************************************
+
+PresetSingle
+Query Packet:5
+Number of packets to send: 8
+11 06 00 01 03 67 9B 80
+Expected Response:
+11 06 00 01 03 67 9B 80
+Actual Response:
+11 06 00 01 03 67 9B 80
+Test Passed - Data Entered
+
+**************************************************
+
+PresetSingle
+Query Packet:6 - Address Error
+Number of packets to send: 5
+11 06 00 87 03 67 7A 69
+Expected Response:
+11 86 02 C2 64
+Actual Response:
+11 86 02 C2 64
+Test Passed - Data not Entered
+
+**************************************************
+
+PresetSingle
+Query Packet:7 - Data Error
+Number of packets to send: 4
+11 06 00 01 FF 07 DA A8
+Expected Response:
+11 86 03 03 A4
+Actual Response:
+11 86 03 03 A4
+Test Passed - Data not Entered
+
+**************************************************
+
+PresetMultiple
+Query Packet:8
+Number of packets to send: 8
+11 10 00 07 00 02 04 00 60 07 05 24 A4
+Expected Response:
+11 10 00 07 00 02 F2 99
+Actual Response:
+11 10 00 07 00 02 F2 99
+Test Passed - Data Entered
+
+**************************************************
+
+PresetMultiple
+Query Packet:9 - Address Error
+Number of packets to send: 5
+11 10 00 92 00 02 04 00 90 07 05 ED C4
+Expected Response:
+11 90 02 CC 04
+Actual Response:
+11 90 02 CC 04
+Test Passed - Data not Entered
+
+**************************************************
+
+PresetMultiple
+Query Packet:10 - Data Error
+Number of packets to send: 3
+11 10 00 01 00 02 04 00 60 FF F0 27 09 
+Expected Response:
+11 90 03 0D C4
+Actual Response:
+11 90 03 0D C4
+Test Passed - Data not Entered
+
+**************************************************
+
+PresetSingle
+Query Packet:11
+Number of packets to send: 8
+11 06 00 35 03 99 5B CE
+Expected Response:
+11 06 00 35 03 99 5B CE
+Actual Response:
+11 06 00 35 03 99 5B CE
+Test Passed - Data Entered
+
+**************************************************
+
+PresetMultiple
+Query Packet:12
+Number of packets to send: 8
+11 10 00 36 00 02 04 00 04 56 05 9A 33
+Expected Response:
+11 10 00 36 00 02 A3 56
+Actual Response:
+11 10 00 36 00 02 A3 56
+Test Passed - Data Entered
+
+**************************************************
+
+ReadHolding
+Query Packet:13
+Number of packets to send: 8
+16 03 00 35 00 03 16 E2
+Expected Response:
+FF FF
+Actual Response:
+11 10 00 36 00 02 A3 56
+Test failed
+
+**************************************************
+
+ReadHolding
+Query Packet:14
+Number of packets to send: 11
+11 03 00 06 00 03 E7 5A
+Expected Response:
+11 03 06 8E 2E 9D 07 A1 FA 7D E3
+Actual Response:
+11 03 06 8E 2E 9D 07 A1 FA 7D E3
+Test Passed
+
+**************************************************
+
+ReadHolding
+Query Packet:15
+Number of packets to send: 11
+11 03 00 45 00 03 16 8E
+Expected Response:
+11 03 06 9E 93 A5 F8 B4 38 A1 39
+Actual Response:
+11 03 06 9E 93 A5 F8 B4 38 A1 39
+Test Passed
+
+*************************************************
+
+PresetMultiple
+Query Packet:16
+Number of packets to send: 8
+11 10 00 54 00 02 04 00 87 65 07 79 1B
+Expected Response:
+11 10 00 54 00 02 02 88
+Actual Response:
+11 10 00 54 00 02 02 88
+Test Passed - Data Entered
+
+**************************************************
+
+ReadHolding
+Query Packet:17
+Number of packets to send: 9
+11 03 00 54 00 02 87 4B
+Expected Response:
+11 03 04 9E A5 AF 4B E9 FE
+Actual Response:
+11 03 04 9E A5 AF 4B E9 FE
+Test Passed
+
+**************************************************
+
+PresetMultiple
+Query Packet:18
+Number of packets to send: 8
+11 10 00 30 00 20 40 4F 3D 21 6B 7A 16 59 4C 2A 35 60 52 09 7D 0C 1A 68 3F 47 75 18 38 2F 62 1D 0A 5B 6F 43 27 56 29 53 6C 3E 72 05 1F 49 4E 37 09 5D 44 63 28 1C 7B 0D 32 67 2B 5A 7C 10 4A 2C 39 6A 08 1E 57 42 24 12 83
+Expected Response:
+11 10 00 30 00 20 C3 4E
+Actual Response:
+11 10 00 30 00 20 C3 4E
+Test Passed - Data Entered
+
+**************************************************
+
+ReadHolding
+Query Packet:19
+Number of packets to send: 69
+11 03 00 30 00 20 46 8D
+Expected Response:
+11 03 40 4C CD 5D 35 6E 6A 7D 14 8C F8 9F 65 AE 1B BF 9E CC BB D9 AA E8 84 F9 50 0D AA 1E 75 25 D6 34 33 46 BD 57 40 6A 0E 7B 8F 8F 4A 9E 93 A5 F8 B4 38 C5 83 D6 4F E7 29 F8 90 1A B7 2D 58 38 D4 49 19 91 3E
+Actual Response:
+11 03 40 4C CD 5D 35 6E 6A 7D 14 8C F8 9F 65 AE 1B BF 9E CC BB D9 AA E8 84 F9 50 0D AA 1E 75 25 D6 34 33 46 BD 57 40 6A 0E 7B 8F 8F 4A 9E 93 A5 F8 B4 38 C5 83 D6 4F E7 29 F8 90 1A B7 2D 58 38 D4 49 19 91 3E
+Test Passed
+
+***************************************************

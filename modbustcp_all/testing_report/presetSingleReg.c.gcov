@@ -1,0 +1,68 @@
+        -:    0:Source:Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/presetSingleReg.c
+        -:    0:Programs:14
+        -:    1:/*QUERY FRAME:
+        -:    2:| Transaction Identifier | Protocol Identifier | Length | Unit Identifier | Function Code | Address | Value |
+        -:    3:|------------------------|---------------------|--------|-----------------|---------------|---------|-------|
+        -:    4:|       2 bytes          |      2 bytes        |2 bytes |      1 byte     |     1 byte    |  2 bytes| 2 bytes|
+        -:    5:
+        -:    6:RESPONSE FRAME:
+        -:    7:| Transaction Identifier | Protocol Identifier | Length | Unit Identifier | Function Code | Address | Value |
+        -:    8:|------------------------|---------------------|--------|-----------------|---------------|---------|-------|
+        -:    9:|       2 bytes          |      2 bytes        |2 bytes |      1 byte     |     1 byte    |  2 bytes| 2 bytes|
+        -:   10: *
+        -:   11: *
+        -:   12: * Function Code - 06
+        -:   13: * DataRegister[25]={0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x0009, 0x0008, 0x0007, 0x0007, 0x0006, 0x0005, 0x0004, 0x0003, 0x0002, 0x0001, 0x0025, 0x0035, 0x0036, 0x9957, 0x7890};
+        -:   14: * INPUT FRAME = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x10, 0x06, 0x00, 0x01, 0x00, 0x03}
+        -:   15: *
+        -:   16: * Preset Register 01 to 0x0003
+        -:   17: * RESPONSE FRAME = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x10, 0x06, 0x00, 0x01, 0x00, 0x03}
+        -:   18: * DATAREGISTER [] ={0x0000, 0x0003, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x0009, 0x0008, 0x0007, 0x0007, 0x0006, 0x0005, 0x0004, 0x0003, 0x0002, 0x0001, 0x0025, 0x0035, 0x0036, 0x9957, 0x7890}
+        -:   19: *
+        -:   20: *When Error detected
+        -:   21: * RESPONSE FRAME = {0x0, 0x1, 0x2, 0x3, 0x0, 0x3, 0x10, 0x86, 0x3} - 9 bytes
+        -:   22: * DATAREGISTER UNMODIFIED.
+        -:   23: *
+        -:   24: *
+        -:   25: */
+        -:   26:
+        -:   27:#include "modbusTcp.h"
+        -:   28:
+        5:   29:uint16_t presetSingleRegister(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData)
+        -:   30:{
+        5:   31:  uint16_t length = 0;
+        -:   32:
+        -:   33:  /* Assigning values for transmitting buffer*/
+        5:   34:  p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
+        5:   35:  p_modbusTxBuf[1] = p_parseModbusTcpData->transactionID.v[0];
+        -:   36:
+        5:   37:  p_modbusTxBuf[2] = p_parseModbusTcpData->protocolID.v[1];
+        5:   38:  p_modbusTxBuf[3] = p_parseModbusTcpData->protocolID.v[0];
+        -:   39:
+        5:   40:  p_modbusTxBuf[4] = 0X0;
+        5:   41:  p_modbusTxBuf[5] = p_parseModbusTcpData->length;
+        -:   42:
+        5:   43:  p_modbusTxBuf[6] = p_parseModbusTcpData->unitID;
+        5:   44:  p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
+        -:   45:
+        5:   46:  if (p_parseModbusTcpData->preset_Data.Val >= 65000) /* checks for illegal data value */
+        -:   47:  {
+        1:   48:    p_parseModbusTcpData->functionCode = p_parseModbusTcpData->functionCode + 0x80;
+        1:   49:    modbusError(p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Value);
+        1:   50:    length = 0x9;
+        -:   51:  }
+        -:   52:  else
+        -:   53:  {
+        4:   54:    p_dataMemory[p_parseModbusTcpData->startAddress.Val] = (p_parseModbusTcpData->preset_Data.v[0] + p_parseModbusTcpData->preset_Data.v[1] * 0x100);
+        -:   55:
+        -:   56:    /* Assigning values for transmitting buffer*/
+        4:   57:    p_modbusTxBuf[8] = p_parseModbusTcpData->startAddress.v[1];
+        4:   58:    p_modbusTxBuf[9] = p_parseModbusTcpData->startAddress.v[0];
+        -:   59:
+        4:   60:    p_modbusTxBuf[10] = p_parseModbusTcpData->preset_Data.v[1]; /* Preset Data Hi */
+        -:   61:
+        4:   62:    p_modbusTxBuf[11] = p_parseModbusTcpData->preset_Data.v[0]; /* Preset Data Lo */ 
+        4:   63:    length = 0x6 + p_parseModbusTcpData->length;
+        -:   64:  }
+        5:   65:  return length;
+        -:   66:}

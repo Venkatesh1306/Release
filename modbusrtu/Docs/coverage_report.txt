@@ -1,0 +1,45 @@
+File 'Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/libModbusRtu/modbusRtuFrame.c'
+Lines executed:100.00% of 37
+Creating 'modbusRtuFrame.c.gcov'
+
+File 'Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/libModbusRtu/modbusRtuPacketParse.c'
+Lines executed:100.00% of 19
+Creating 'modbusRtuPacketParse.c.gcov'
+
+File 'Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/libModbusRtu/modbusRtuError.c'
+Lines executed:100.00% of 8
+Creating 'modbusRtuError.c.gcov'
+
+File 'Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/libModbusRtu/readHoldingReg.c'
+Lines executed:100.00% of 17
+Creating 'readHoldingReg.c.gcov'
+
+File 'Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/libModbusRtu/presetSingleReg.c'
+Lines executed:100.00% of 18
+Creating 'presetSingleReg.c.gcov'
+
+File 'Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/libModbusRtu/presetMultipleReg.c'
+Lines executed:100.00% of 22
+Creating 'presetMultipleReg.c.gcov'
+
+File 'Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/libModbusRtu/crcRTU.c'
+Lines executed:93.94% of 33
+Creating 'crcRTU.c.gcov'
+
+File 'Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/test/test.c'
+Lines executed:100.00% of 18
+Creating 'test.c.gcov'
+
+File '<built-in>'
+No executable lines
+Removing '<built-in>.gcov'
+
+File 'Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/test/compare.c'
+Lines executed:100.00% of 24
+Creating 'compare.c.gcov'
+
+File 'Z:/On_testing/modbusrtu/Modbus_RTU_WT.X/test/printfunc.c'
+Lines executed:100.00% of 37
+Creating 'printfunc.c.gcov'
+
+Lines executed:99.14% of 233

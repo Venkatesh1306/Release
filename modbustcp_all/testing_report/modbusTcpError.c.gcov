@@ -1,0 +1,46 @@
+        -:    0:Source:Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/libModbusTcp/modbusTcpError.c
+        -:    0:Programs:14
+        -:    1:/*
+        -:    2:QUERY FRAME:
+        -:    3:
+        -:    4:| Transaction Identifier | Protocol Identifier | Length | Unit Identifier | Function Code | Starting Address | Quantity of Registers |
+        -:    5:|------------------------|---------------------|--------|-----------------|---------------|------------------|-----------------------|
+        -:    6:|       2 bytes          |      2 bytes        |2 bytes |      1 byte     |     1 byte    |     2 bytes      |       2 bytes         |
+        -:    7:
+        -:    8:RESPONSE FRAME:
+        -:    9:
+        -:   10:| Transaction Identifier | Protocol Identifier | Length | Unit Identifier | Function Code + 0x80 | Exceptional Code    |
+        -:   11:|------------------------|---------------------|--------|-----------------|----------------------|---------------------|
+        -:   12:|       2 bytes          |      2 bytes        |2 bytes |      1 byte     |     1 byte           |   1 byte            |
+        -:   13:
+        -:   14:FUNCTION CODE ERROR:(0X01)
+        -:   15: * INPUT FRAME  = {0x00, 0x01, 0x00, 0x03, 0x00, 0x05, 0x03, 0x09, 0x00, 0x6, 0x00, 0x03} - 12 bytes
+        -:   16: * Here the function code is invalid (0x09)
+        -:   17: * RESPONSE FRAME = {0x0, 0x1, 0x0, 0x3, 0x0, 0x3, 0x03, 0x89, 0x01} - 9 bytes
+        -:   18:
+        -:   19:ADDRESS ERROR:(0X02)
+        -:   20: * INPUT FRAME  = {0x00, 0x01, 0x00, 0x03, 0x00, 0x05, 0x03, 0x03, 0x00, 0x8D, 0x00, 0x03} - 12 bytes
+        -:   21: * Here the Start Address is invalid (0x008D).Address size should not exceed DataRegistersize. DataRegistersize is defined as 0x7D.
+        -:   22: * RESPONSE FRAME = {0x0, 0x1, 0x0, 0x3, 0x0, 0x3, 0x03, 0x83, 0x02} - 9 bytes
+        -:   23:
+        -:   24:DATA ERROR:(0X03) -- for Function code - 0x06 and 0x10:
+        -:   25: * INPUT FRAME  = {0x00, 0x01, 0x00, 0x03, 0x00, 0x06, 0x03, 0x06, 0x00, 0x05, 0xFF, 0x09} - 12 bytes
+        -:   26: * Here the Data to be enter is invalid (0xFF09).Address size should not 65000(0xFDE8).
+        -:   27: * RESPONSE FRAME = {0x0, 0x1, 0x0, 0x3, 0x0, 0x3, 0x03, 0x86, 0x03} - 9 bytes
+        -:   28: */
+        -:   29:
+        -:   30:#include "modbusTcp.h"
+        -:   31:
+       13:   32:void modbusError(mbPacketParse_t *p_parseModbusTcpData, uint8_t *p_modbusTxBuf, unsigned char exceptioncode)
+        -:   33:{
+        -:   34:  /* Assigning values for transmitting buffer*/
+       13:   35:  p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
+       13:   36:  p_modbusTxBuf[1] = p_parseModbusTcpData->transactionID.v[0];
+       13:   37:  p_modbusTxBuf[2] = p_parseModbusTcpData->protocolID.v[1];
+       13:   38:  p_modbusTxBuf[3] = p_parseModbusTcpData->protocolID.v[0];
+       13:   39:  p_modbusTxBuf[4] = 0X00;
+       13:   40:  p_modbusTxBuf[5] = 0X03; /* length - no. of bytes contained in the data plus function code and Unit identifier */
+       13:   41:  p_modbusTxBuf[6] = p_parseModbusTcpData->unitID;
+       13:   42:  p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
+       13:   43:  p_modbusTxBuf[8] = exceptioncode;
+       13:   44:}

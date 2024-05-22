@@ -1,0 +1,82 @@
+        -:    0:Source:Z:/On_testing/modbustcp/SampleModbusTCP_8Fn/test/printfunc.c
+        -:    0:Programs:14
+        -:    1:#include "testhead.h"
+        -:    2:
+       36:    3:void printfunction()
+        -:    4:{
+       36:    5:    switch (ModbusRxBuf[7])
+        -:    6:    {
+        -:    7:    case 0x01:
+        3:    8:        printf(ANSI_COLOR_BLUE "\nReadCoilStatus");
+        3:    9:        break;
+        -:   10:    case 0x02:
+        3:   11:        printf(ANSI_COLOR_BLUE "\nReadInputStatus");
+        3:   12:        break;
+        -:   13:    case 0x03:
+        9:   14:        printf(ANSI_COLOR_BLUE "\nReadHolding");
+        9:   15:        break;
+        -:   16:    case 0x04:
+        2:   17:        printf(ANSI_COLOR_BLUE "\nReadInputRegisters");
+        2:   18:        break;
+        -:   19:    case 0x05:
+        3:   20:        printf(ANSI_COLOR_BLUE "\nForceSingleCoil");
+        3:   21:        break;
+        -:   22:    case 0x06:
+        6:   23:        printf(ANSI_COLOR_BLUE "\nPresetSingle");
+        6:   24:        break;
+        -:   25:    case 0x0f:
+        3:   26:        printf(ANSI_COLOR_BLUE "\nForceMultipleCoils");
+        3:   27:        break;
+        -:   28:    case 0x10:
+        6:   29:        printf(ANSI_COLOR_BLUE "\nPresetMultiple");
+        6:   30:        break;
+        -:   31:    }
+       36:   32:    printf(ANSI_COLOR_RESET "\nQuery Packet:%d", incrs + 1);
+        -:   33:
+       36:   34:    if (ModbusTxBuf[7] > 0x80)
+        -:   35:    {
+       13:   36:        switch (ModbusTxBuf[8])
+        -:   37:        {
+        -:   38:        case 1:
+        1:   39:            printf(ANSI_COLOR_ORANGE " - Function Error ");
+        1:   40:            break;
+        -:   41:        case 2:
+        8:   42:            printf(ANSI_COLOR_ORANGE " - Address Error ");
+        8:   43:            break;
+        -:   44:        case 3:
+        4:   45:            printf(ANSI_COLOR_ORANGE " - Data Error ");
+        4:   46:            break;
+        -:   47:        }
+        -:   48:    }
+        -:   49:
+        -:   50:#ifdef result
+        -:   51:
+       36:   52:    printf(ANSI_COLOR_RESET "\n");
+       36:   53:    printf("Number of packets to send: %d\n", ModbusTxLength);
+        -:   54:
+      518:   55:    for (int i = 0; i < ModbusRxBuftest[incrs][0]; i++)
+      482:   56:        printf("%02X ", ModbusRxBuf[i]);
+       36:   57:    printf("\n");
+        -:   58:
+       36:   59:    printf("Expected Response:\n");
+      457:   60:    for (int i = 0; i < expected_TXA[incrs][0]; i++)
+      421:   61:        printf("%02X ", expec_TX[i]);
+       36:   62:    printf("\n");
+        -:   63:
+       36:   64:    printf("Actual Response:\n");
+       36:   65:    int responseLength = (ModbusTxBuf[7] == 0x06 || ModbusTxBuf[7] == 0x10 || ModbusTxBuf[7] == 0x05 || ModbusTxBuf[7] == 0x0f) ? 0x0C : ((ModbusTxBuf[7] < 0x80) ? 0x09 + ModbusTxBuf[8] : 0x09);
+      457:   66:    for (int i = 0; i < responseLength; i++)
+      421:   67:        printf("%02X ", ModbusTxBuf[i]);
+       36:   68:    printf("\n");
+        -:   69:
+        -:   70:#endif
+        -:   71:
+       36:   72:    printf(Test_Res == 1 ? ANSI_COLOR_GREEN " Test Passed" : ANSI_COLOR_RED " Test failed\n");
+        -:   73:
+       36:   74:    if ((ModbusRxBuf[7] == 0x05) || (ModbusRxBuf[7] == 0x6) ||  (ModbusRxBuf[7] == 0x10)  || (ModbusRxBuf[7] == 0x0f))
+        -:   75:
+       18:   76:        printf(test_c == 1 ? ANSI_COLOR_RED " - Data not Entered" : ANSI_COLOR_GREEN " - Data Entered");
+        -:   77:
+       36:   78:    printf("\n");
+       36:   79:    printf(ANSI_COLOR_RESET); // Reset color to default
+       36:   80:}

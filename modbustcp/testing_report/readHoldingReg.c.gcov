@@ -1,0 +1,60 @@
+        -:    0:Source:Z:/On_testing/modbustcp/Sample_Mobus_t.X/libModbusTcp/readHoldingReg.c
+        -:    0:Programs:9
+        -:    1:/*
+        -:    2:QUERY FRAME:
+        -:    3:
+        -:    4:| Transaction Identifier | Protocol Identifier | Length | Unit Identifier | Function Code | Starting Address | Quantity of Registers |
+        -:    5:|------------------------|---------------------|--------|-----------------|---------------|------------------|-----------------------|
+        -:    6:|       2 bytes          |      2 bytes        |2 bytes |      1 byte     |     1 byte    |     2 bytes      |       2 bytes         |
+        -:    7:
+        -:    8:RESPONSE FRAME:
+        -:    9:
+        -:   10:| Transaction Identifier | Protocol Identifier | Length | Unit Identifier | Function Code | Byte Count | Data                |
+        -:   11:|------------------------|---------------------|--------|-----------------|---------------|------------|---------------------|
+        -:   12:|       2 bytes          |      2 bytes        |2 bytes |      1 byte     |     1 byte    |   1 byte   | Variable (n bytes)  |
+        -:   13:
+        -:   14: * INPUT FRAME  = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x10, 0x03, 0x00, 0x6, 0x00, 0x03} - 12 bytes
+        -:   15: * DATAREGISTER = {0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x0009, 0x0008, 0x0007, 0x0007, 0x0006, 0x0005, 0x0004, 0x0003, 0x0002, 0x0001, 0x0025, 0x0035, 0x0036, 0x9957, 0x7890}
+        -:   16:
+        -:   17: * The Query Message specifies the starting register and Quantity of registers to be read
+        -:   18: * This Query Request to read 3 register values from starting address 0x06 (0x06, 0x07, 0x08)
+        -:   19: * RESPONSE FRAME = {0x0, 0x1, 0x2, 0x3, 0x0, 0x9, 0x10, 0x3, 0x6, 0x0, 0x6, 0x0, 0x7, 0x0, 0x8} - 15 bytes(9 bytes + (2* no of Registers))
+        -:   20: *
+        -:   21: * when error detected :
+        -:   22: * RESPONSE FRAME = {0x0, 0x1, 0x2, 0x3, 0x0, 0x3, 0x10, 0x91, 0x1} - 9 bytes
+        -:   23: */
+        -:   24:
+        -:   25:#include "modbusTcp.h"
+        -:   26:
+        -:   27:
+        6:   28:uint16_t readHoldingRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData)
+        -:   29:{
+        -:   30:  /* Declaration of local variables*/
+        6:   31:  uint16_t length = 0;
+        -:   32:  unsigned int a, b;
+        -:   33:
+        -:   34:  /* Assigning values for transmitting buffer*/
+        6:   35:  p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
+        6:   36:  p_modbusTxBuf[1] = p_parseModbusTcpData->transactionID.v[0];
+        -:   37:
+        6:   38:  p_modbusTxBuf[2] = p_parseModbusTcpData->protocolID.v[1];
+        6:   39:  p_modbusTxBuf[3] = p_parseModbusTcpData->protocolID.v[0];
+        -:   40:
+        6:   41:  p_modbusTxBuf[4] = 0X0;
+        -:   42:
+        6:   43:  p_modbusTxBuf[6] = p_parseModbusTcpData->unitID;
+        6:   44:  p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
+        6:   45:  p_modbusTxBuf[8] = p_parseModbusTcpData->numberofRegister.Val * 2;
+        6:   46:  p_modbusTxBuf[5] = p_modbusTxBuf[8] + 0X03;
+        -:   47:
+       35:   48:  for (a = 0; a < p_parseModbusTcpData->numberofRegister.Val; a++)
+        -:   49:  {
+       29:   50:    b = a * 2;
+        -:   51:
+       29:   52:    p_modbusTxBuf[9 + b] = p_dataMemory[p_parseModbusTcpData->startAddress.Val + a] / 0x100;
+       29:   53:    p_modbusTxBuf[10 + b] = p_dataMemory[p_parseModbusTcpData->startAddress.Val + a] % 0x100;
+        -:   54:  }
+        -:   55:
+        6:   56:  length = 0x9 + p_modbusTxBuf[8];
+        6:   57:  return length;
+        -:   58:}

@@ -44,8 +44,8 @@
   2.0   07/13/09     Updated for new release of coding standards
 *******************************************************************/
 
-#ifndef __MODHEAD_H_
-#define __MODHEAD_H_
+#ifndef __MODBUSRTUTYPEDEF_H_
+#define __MODBUSRTUTYPEDEF_H_
 
 /* Specify an extension for GCC based compilers */
 #if defined(__GNUC__)
@@ -68,7 +68,7 @@ typedef char                    char8_t;
 typedef unsigned char           uchar8_t;
 
 typedef unsigned char           uint8_t;                           /* 8-bit unsigned  */
-typedef unsigned short int      uint16_t;                           /* 16-bit unsigned */
+typedef unsigned  int           uint16_t;                           /* 16-bit unsigned */
 typedef unsigned long           uint32_t;                          /* 32-bit unsigned */
 /* MPLAB C Compiler for PIC18 does not support 64-bit integers */
 __EXTENSION
@@ -274,4 +274,4 @@ typedef union
 
 #undef __EXTENSION
 
-#endif /* __MODHEAD_H_*/
+#endif /* __MODBUSRTUTYPEDEF_H_*/

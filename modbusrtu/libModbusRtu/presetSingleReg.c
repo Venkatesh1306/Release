@@ -36,9 +36,9 @@ uint16_t presetSingleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, m
     p_modbusTxBuf[0] = p_parseModbusRtuData->slave_addr.Val;
     p_modbusTxBuf[1] = p_parseModbusRtuData->functionCode;
 
-    if (p_parseModbusRtuData->preset_Data.Val >= 65000)
+    if (p_parseModbusRtuData->preset_Data.Val >= IllegalDataCheck)
     {
-        p_parseModbusRtuData->functionCode = p_parseModbusRtuData->functionCode + 128;
+        p_parseModbusRtuData->functionCode = p_parseModbusRtuData->functionCode + 0x80;
         modbusError(p_parseModbusRtuData, p_modbusTxBuf, Illegal_Data_Value);
         length = 0x04;
     }

@@ -16,8 +16,8 @@ Function name    : uint16_t modbusRtuParse(mbPacketParse_t *p_parseModbusRtuData
 #include "modbusRtu.h"
 
 /* Global variable Declaration */
-unsigned int c2, d2, bytesrx;
-unsigned char exceptioncode;
+uint16_t c2, d2, bytesrx;
+uint8_t exceptioncode;
 
 uint16_t modbusRtuParse(mbPacketParse_t *p_parseModbusRtuData, const uint8_t *p_modbusRxBuf)
 {
@@ -40,13 +40,15 @@ uint16_t modbusRtuParse(mbPacketParse_t *p_parseModbusRtuData, const uint8_t *p_
         p_parseModbusRtuData->numberofRegister.v[1] = p_modbusRxBuf[4];
         p_parseModbusRtuData->numberofRegister.v[0] = p_modbusRxBuf[5];
         p_parseModbusRtuData->byteCount = p_modbusRxBuf[6];
-
-        for (c2 = 0; c2 < p_parseModbusRtuData->numberofRegister.Val; c2++)
+        if (p_parseModbusRtuData->numberofRegister.Val < (int)(DataRegistersizeCheck)) /* checks for overflow of data array size*/
         {
+            for (c2 = 0; c2 < p_parseModbusRtuData->numberofRegister.Val; c2++)
+            {
 
-            d2 = c2 * 2;
-            p_parseModbusRtuData->data[c2].v[1] = p_modbusRxBuf[7 + d2];
-            p_parseModbusRtuData->data[c2].v[0] = p_modbusRxBuf[8 + d2]; /* Data for preset value for multiple register */
+                d2 = c2 * 2;
+                p_parseModbusRtuData->data[c2].v[1] = p_modbusRxBuf[7 + d2];
+                p_parseModbusRtuData->data[c2].v[0] = p_modbusRxBuf[8 + d2]; /* Data for preset value for multiple register */
+            }
         }
     }
     else

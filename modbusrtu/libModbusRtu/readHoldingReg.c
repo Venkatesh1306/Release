@@ -32,7 +32,7 @@ uint16_t readHoldingRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mb
     /* local variable declaration */
     uint16_t length = 0;
     uint16_t txlength = 0;
-    unsigned int a = 0, b = 0;
+    uint16_t a = 0, b = 0;
 
     /* Assigning values for modbustx buffer */
     p_modbusTxBuf[0] = p_parseModbusRtuData->slave_addr.Val;

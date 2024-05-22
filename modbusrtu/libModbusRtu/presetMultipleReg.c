@@ -33,7 +33,7 @@ uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory,
 {
     /* Local variable Declaration */
     uint16_t length = 0;
-    unsigned int limit = 0;
+    uint16_t limit = 0;
 
     /* Assigning values for modbustx buffer */
     p_modbusTxBuf[0] = p_parseModbusRtuData->slave_addr.Val;
@@ -41,7 +41,7 @@ uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory,
 
     for (limit = 0; limit < p_parseModbusRtuData->numberofRegister.v[0]; limit++)
     {
-        if (p_parseModbusRtuData->data[limit].Val >= 65000)
+        if (p_parseModbusRtuData->data[limit].Val >= IllegalDataCheck)
         {
 
             p_parseModbusRtuData->functionCode = p_parseModbusRtuData->functionCode + 0x80;

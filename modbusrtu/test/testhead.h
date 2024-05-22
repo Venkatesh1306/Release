@@ -1,5 +1,5 @@
 // including the required header files
-#include "..\modhead.h"
+//#include "..\modbusRtutypedef.h"
 #include "..\libModbusRtu\modbusRtu.h"
 #include <stdio.h>
 // #include <stdint.h>

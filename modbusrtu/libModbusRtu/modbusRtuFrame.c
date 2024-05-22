@@ -26,7 +26,7 @@ uint16_t modbusRtuFrame(const uint8_t *p_modbusRxBuf, uint16_t *p_dataMemory, ui
     {
         /* local variable declaration */
         uint16_t check = 0;
-        unsigned int preMultiLength = 0;
+        uint16_t preMultiLength = 0;
 
         /* Parse Function */
         modbusRtuParse(&p_parseModbusRtuData, p_modbusRxBuf);
@@ -38,6 +38,12 @@ uint16_t modbusRtuFrame(const uint8_t *p_modbusRxBuf, uint16_t *p_dataMemory, ui
             p_parseModbusRtuData.functionCode = p_parseModbusRtuData.functionCode + 0x80;
             modbusError(&p_parseModbusRtuData, p_modbusTxBuf, Illegal_Function_Code);
             *modBusframeLength = 0x05;
+        }
+        else if (p_parseModbusRtuData.numberofRegister.Val > (MaxSizeRtuTx - 3)) /* Data error */
+        {
+            p_parseModbusRtuData.functionCode = p_parseModbusRtuData.functionCode + 0x80;
+            modbusError(&p_parseModbusRtuData, p_modbusTxBuf, Illegal_Data_Value);
+            *modBusframeLength = 0x9;
         }
         else if (p_parseModbusRtuData.functionCode == ReadHoldingRegister ||
                  p_parseModbusRtuData.functionCode == PresetMultipleRegisters) /* checks for address error */

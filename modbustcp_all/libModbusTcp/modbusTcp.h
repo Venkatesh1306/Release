@@ -32,9 +32,9 @@
  *
  * Usage :
  *      Example : # include "ModbusTcp.h"
-*/
+ */
 
-#include "..\modhead.h"
+#include "..\modbusTcptypedef.h"
 
 #ifndef MODBUSTCP_H
 #define MODBUSTCP_H
@@ -51,10 +51,13 @@
 
 /* Definitions for size which the array and variables not be exceed*/
 #define DataRegistersize 0x7d
-#define DataRegister1size 0x100
+#define DataRegistersizeCheck (DataRegistersize - 1)
+#define CoilDatasize 0x100
 #define MaxSizeTcpTx 100
 #define MaxSizeTxtempbuf 30
 #define MaxSizeCoilData 25
+#define MaxSizeCoilDataCheck (MaxSizeCoilData - 1)
+#define IllegalDataCheck 65000
 
 /*Error Code Definitions */
 #define Illegal_Function_Code 0x01u
@@ -62,34 +65,33 @@
 #define Illegal_Data_Value 0x03u
 
 /* Declaration of Structure Variables */
-typedef struct
-{
-  uint16_t_VAL transactionID;
-  uint16_t_VAL protocolID;
-  uint16_t length;
-  uint8_t unitID;
-  uint8_t functionCode;
-  uint16_t_VAL startAddress;
-  uint16_t_VAL numberofRegister;
-  uint16_t byteCount;
-  uint16_t_VAL preset_Data;
-  uint16_t coilData[25];
-  uint16_t_VAL forceData[25];
-  uint16_t_VAL data[100];
+typedef struct {
+    uint16_t_VAL transactionID;
+    uint16_t_VAL protocolID;
+    uint16_t length;
+    uint8_t unitID;
+    uint8_t functionCode;
+    uint16_t_VAL startAddress;
+    uint16_t_VAL numberofRegister;
+    uint16_t byteCount;
+    uint16_t_VAL preset_Data;
+    uint16_t coilData[MaxSizeCoilData];
+    uint16_t_VAL forceData[MaxSizeCoilData];
+    uint16_t_VAL data[DataRegistersize];
 
 } mbPacketParse_t;
 
 /* declaration of functions */
 uint16_t modbusTcpFrame(const uint8_t *p_modbusRxBuf, uint16_t *p_dataMemory, uint8_t *p_modbusTxBuf, uint16_t *modBusframeLength); /* Frame function */
-uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData, const uint8_t *p_modbusRxBuf);                                       /* Parse Function */
-uint16_t readCoilStatus(uint8_t *p_modbusTxBuf, const uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData);               /* Function Code - 0x01 */
-uint16_t readInputStatus(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData);                    /* Function Code - 0x02 */
-uint16_t readHoldingRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData);               /* Function Code - 0x03 */
-uint16_t readInputReg(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData);                       /* Function Code - 0x04 */
-uint16_t forceSingleCoil(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData);                    /* Function Code - 0x05 */
-uint16_t presetSingleRegister(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData);               /* Function Code - 0x06 */
-uint16_t forceMultipleCoils(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData);                 /* Function Code - 0x0f */
-uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData);            /* Function Code - 0x10 */
-void modbusError(mbPacketParse_t *p_parseModbusTcpData, uint8_t *p_modbusTxBuf, unsigned char exceptioncode);                       /* Error Function */
+uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData, const uint8_t *p_modbusRxBuf); /* Parse Function */
+uint16_t readCoilStatus(uint8_t *p_modbusTxBuf, const uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x01 */
+uint16_t readInputStatus(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x02 */
+uint16_t readHoldingRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x03 */
+uint16_t readInputReg(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x04 */
+uint16_t forceSingleCoil(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x05 */
+uint16_t presetSingleRegister(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x06 */
+uint16_t forceMultipleCoils(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x0f */
+uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x10 */
+void modbusError(mbPacketParse_t *p_parseModbusTcpData, uint8_t *p_modbusTxBuf, unsigned char exceptioncode); /* Error Function */
 
 #endif

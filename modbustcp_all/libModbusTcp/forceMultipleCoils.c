@@ -15,18 +15,18 @@ RESPONSE FRAME:
  * RESPONSE FRAME = {0x00, 0x01, 0x00, 0x02, 0x00, 0x06, 0x03, 0x0F, 0x00, 0x01, 0x00, 0x15}
  */
 
-#include "ModbusTcp.h"
+#include "modbusTcp.h"
 
 /* Macro definitions */
 #define SET(x, y) x |= (1 << y)
 #define READ(x, y) ((0u == (x & (1 << y))) ? 0u : 1u)
 #define CLEAR(x, y) x &= ~(1 << y)
 
-uint16_t forceMultipleCoils(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData)
-{
+uint16_t forceMultipleCoils(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData) {
+
     /* Declaration of local variables*/
-    unsigned int NoOfBits = 0, bit_count = 0, Regbit = 0, regTx = 0, RegbitTx = 0, reg = 0;
-    unsigned int coil_data = 0;
+    uint16_t NoOfBits = 0, bit_count = 0, Regbit = 0, regTx = 0, RegbitTx = 0, reg = 0;
+    uint16_t coil_data = 0;
 
     /* Assigning values for transmitting buffer*/
     p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
@@ -49,35 +49,27 @@ uint16_t forceMultipleCoils(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPa
 
     NoOfBits = p_parseModbusTcpData->numberofRegister.Val; /*Quantity of coils*/
 
-    for (bit_count = NoOfBits - 1; bit_count >= 0; bit_count--) /*byte count*/
-    {
+    for (bit_count = NoOfBits - 1; bit_count >= 0; bit_count--) /*byte count*/ {
 
         Regbit = (p_parseModbusTcpData->startAddress.Val + bit_count - 1) % 16; /* 20 - 1 % 16 = 4th bit */
-        reg = (p_parseModbusTcpData->startAddress.Val + bit_count - 1) / 16;    /* 20 - 1 /16 = 1st  reg */
+        reg = (p_parseModbusTcpData->startAddress.Val + bit_count - 1) / 16; /* 20 - 1 /16 = 1st  reg */
 
         RegbitTx = (bit_count) % 16; /* 20 - 1 % 16 = 4th bit -- bit increment */
-        regTx = (bit_count) / 16;    /* 20 - 1 /16 = 1st  reg -- register increment */
+        regTx = (bit_count) / 16; /* 20 - 1 /16 = 1st  reg -- register increment */
 
-        if (p_parseModbusTcpData->coilData[regTx] > 65000) /*checks for illegal data*/
-        {
+        if (p_parseModbusTcpData->coilData[regTx] > IllegalDataCheck) /*checks for illegal data*/ {
             p_parseModbusTcpData->functionCode = p_parseModbusTcpData->functionCode + 0x80;
             modbusError(p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Value);
             break;
-        }
-        else
-        {
+        } else {
             coil_data = READ(p_parseModbusTcpData->coilData[regTx], RegbitTx);
 
-            if (coil_data == 0x1)
-            {
+            if (coil_data == 0x1) {
                 SET(p_dataMemory[reg], Regbit);
-            }
-            else
-            {
+            } else {
                 CLEAR(p_dataMemory[reg], Regbit);
             }
-            if (bit_count == 0)
-            {
+            if (bit_count == 0) {
                 break;
             }
         }

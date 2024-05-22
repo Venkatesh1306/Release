@@ -22,13 +22,13 @@ RESPONSE FRAME:
  * RESPONSE FRAME = {0x00, 0x01, 0x02, 0x03, 0x00, 0x03, 0x10, 0x91, 0x01} - 9 bytes
  */
 
-#include "ModbusTcp.h"
+#include "modbusTcp.h"
 
-uint16_t readInputReg(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData)
-{
+uint16_t readInputReg(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData) {
+
     /* Declaration of local variable */
-    unsigned int bytes = 0;
-    unsigned int a = 0, b = 0;
+    uint16_t bytes = 0;
+    uint16_t a = 0, b = 0;
 
     /* Assigning values for transmitting buffer*/
     p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
@@ -41,11 +41,10 @@ uint16_t readInputReg(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketPa
 
     p_modbusTxBuf[6] = p_parseModbusTcpData->unitID;
     p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
-    p_modbusTxBuf[8] = (char)(p_parseModbusTcpData->numberofRegister.Val * 2);
+    p_modbusTxBuf[8] = (char) (p_parseModbusTcpData->numberofRegister.Val * 2);
     p_modbusTxBuf[5] = p_modbusTxBuf[8] + 0X03; /* length */
 
-    for (a = 0; a < p_parseModbusTcpData->numberofRegister.Val; a++)
-    {
+    for (a = 0; a < p_parseModbusTcpData->numberofRegister.Val; a++) {
         b = a * 2;
 
         p_modbusTxBuf[9 + b] = p_dataMemory[p_parseModbusTcpData->startAddress.Val + a] / 0x100;

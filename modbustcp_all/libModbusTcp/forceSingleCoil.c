@@ -18,17 +18,17 @@ RESPONSE FRAME:
  * RESPONSE FRAME = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x10, 0x05, 0x00, 0xAC, 0xFF, 0x00}
  */
 
-#include "ModbusTcp.h"
+#include "modbusTcp.h"
 
 /* Macro definitions */
 #define SET(x, y) x |= (1 << y)
 #define READ(x, y) ((0u == (x & (1 << y))) ? 0u : 1u)
 #define CLEAR(x, y) x &= ~(1 << y)
 
-uint16_t forceSingleCoil(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData)
-{
+uint16_t forceSingleCoil(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData) {
+
     /* Declaration of local variables*/
-    unsigned int length = 0, Regbit = 0, reg = 0;
+    uint16_t length = 0, Regbit = 0, reg = 0;
 
     /* Assigning values for transmitting buffer*/
     p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
@@ -49,21 +49,15 @@ uint16_t forceSingleCoil(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacke
     p_modbusTxBuf[11] = p_parseModbusTcpData->forceData[0].v[0]; /* Force data Lo (00) */
 
     Regbit = (p_parseModbusTcpData->startAddress.Val - 1) % 16; /* 20 - 1 % 16 = 4th bit */
-    reg = (p_parseModbusTcpData->startAddress.Val - 1) / 16;    /* 20 - 1 /16 = 1st  reg */
+    reg = (p_parseModbusTcpData->startAddress.Val - 1) / 16; /* 20 - 1 /16 = 1st  reg */
 
-    if ((p_parseModbusTcpData->forceData[0].Val == 0xff00) || (p_parseModbusTcpData->forceData[0].Val == 0x0000)) /*checks for illegal data*/
-    {
-        if (p_parseModbusTcpData->forceData[0].Val == 0xFF00)
-        {
+    if ((p_parseModbusTcpData->forceData[0].Val == 0xff00) || (p_parseModbusTcpData->forceData[0].Val == 0x0000)) /*checks for illegal data*/ {
+        if (p_parseModbusTcpData->forceData[0].Val == 0xFF00) {
             SET(p_dataMemory[reg], Regbit);
-        }
-        else
-        {
+        } else {
             CLEAR(p_dataMemory[reg], Regbit);
         }
-    }
-    else
-    {
+    } else {
         p_parseModbusTcpData->functionCode = p_parseModbusTcpData->functionCode + 0x80;
         modbusError(p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Value);
     }

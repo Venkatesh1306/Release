@@ -27,7 +27,7 @@ RESPONSE FRAME:
 uint16_t readHoldingRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData) {
 
     /* Declaration of local variables*/
-    uint16_t length = 0;
+    uint8_t length = 0;
     uint16_t a = 0, b = 0;
 
     /* Assigning values for transmitting buffer*/

@@ -19,7 +19,8 @@ Function name    : uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData
 uint16_t c2, d2, bytesrx;
 uint8_t exceptioncode;
 
-uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData, const uint8_t *p_modbusRxBuf) {
+uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData, const uint8_t *p_modbusRxBuf)
+{
 
     /* Parsing of Recieving buffer */
     p_parseModbusTcpData->transactionID.v[1] = p_modbusRxBuf[0];
@@ -38,43 +39,52 @@ uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData, const uint8_t *p_
     p_parseModbusTcpData->startAddress.v[0] = p_modbusRxBuf[9];
 
     /* Allocates data for PresetSingleRegister */
-    if (p_parseModbusTcpData->functionCode == PresetSingleRegister) {
+    if (p_parseModbusTcpData->functionCode == PresetSingleRegister)
+    {
         p_parseModbusTcpData->preset_Data.v[1] = p_modbusRxBuf[10];
         p_parseModbusTcpData->preset_Data.v[0] = p_modbusRxBuf[11];
-    }        /* Allocates data for PresetMultipleRegister */
-    else if (p_parseModbusTcpData->functionCode == PresetMultipleRegisters) {
+    } /* Allocates data for PresetMultipleRegister */
+    else if (p_parseModbusTcpData->functionCode == PresetMultipleRegisters)
+    {
 
         p_parseModbusTcpData->numberofRegister.v[1] = p_modbusRxBuf[10];
         p_parseModbusTcpData->numberofRegister.v[0] = p_modbusRxBuf[11];
 
         p_parseModbusTcpData->byteCount = p_modbusRxBuf[12];
 
-        if (p_parseModbusTcpData->numberofRegister.Val < DataRegistersizeCheck) /* checks for overflow of data array size*/ {
-            for (c2 = 0; c2 < p_parseModbusTcpData->numberofRegister.Val; c2++) {
+        if (p_parseModbusTcpData->numberofRegister.Val < DataRegistersizeCheck) /* checks for overflow of data array size*/
+        {
+            for (c2 = 0; c2 < p_parseModbusTcpData->numberofRegister.Val; c2++)
+            {
                 d2 = c2 * 2;
 
                 p_parseModbusTcpData->data[c2].v[1] = p_modbusRxBuf[13 + d2];
                 p_parseModbusTcpData->data[c2].v[0] = p_modbusRxBuf[14 + d2];
             }
         }
-    }        /* Allocates data for ForceSingleCoil */
-    else if (p_parseModbusTcpData->functionCode == ForceSingleCoil) {
+    } /* Allocates data for ForceSingleCoil */
+    else if (p_parseModbusTcpData->functionCode == ForceSingleCoil)
+    {
         p_parseModbusTcpData->forceData[0].v[1] = p_modbusRxBuf[10];
         p_parseModbusTcpData->forceData[0].v[0] = p_modbusRxBuf[11];
-    }        /* Allocates data for ForceMultipleCoils */
-    else if (p_parseModbusTcpData->functionCode == ForceMultipleCoils) {
+    } /* Allocates data for ForceMultipleCoils */
+    else if (p_parseModbusTcpData->functionCode == ForceMultipleCoils)
+    {
         p_parseModbusTcpData->numberofRegister.v[1] = p_modbusRxBuf[10];
         p_parseModbusTcpData->numberofRegister.v[0] = p_modbusRxBuf[11];
 
         p_parseModbusTcpData->byteCount = p_modbusRxBuf[12];
-        if (p_parseModbusTcpData->numberofRegister.Val < MaxSizeCoilDataCheck) /* checks for overflow of coildata array size*/ {
-            for (c2 = 0; c2 < p_parseModbusTcpData->byteCount / 2; c2++) {
+        if (p_parseModbusTcpData->numberofRegister.Val < MaxSizeCoilDataCheck) /* checks for overflow of coildata array size*/
+        {
+            for (c2 = 0; c2 < p_parseModbusTcpData->byteCount / 2; c2++)
+            {
 
                 p_parseModbusTcpData->coilData[c2] = (p_modbusRxBuf[14 + c2 * 2] << 8) | p_modbusRxBuf[13 + c2 * 2];
             }
         }
-    }        /* Allocates Number of registers for required functions */
-    else {
+    } /* Allocates Number of registers for required functions */
+    else
+    {
 
         p_parseModbusTcpData->numberofRegister.v[1] = p_modbusRxBuf[10];
         p_parseModbusTcpData->numberofRegister.v[0] = p_modbusRxBuf[11];

@@ -28,7 +28,7 @@ RESPONSE FRAME:
 
 uint16_t presetSingleRegister(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData) {
 
-    uint16_t length = 0;
+    uint8_t length = 0;
 
     /* Assigning values for transmitting buffer*/
     p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];

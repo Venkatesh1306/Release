@@ -28,7 +28,8 @@ RESPONSE FRAME:
 uint16_t forceSingleCoil(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData) {
 
     /* Declaration of local variables*/
-    uint16_t length = 0, Regbit = 0, reg = 0;
+    uint16_t Regbit = 0, reg = 0;
+    uint8_t length = 0;
 
     /* Assigning values for transmitting buffer*/
     p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];

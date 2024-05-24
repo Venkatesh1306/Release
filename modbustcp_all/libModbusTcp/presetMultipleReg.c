@@ -27,10 +27,11 @@ RESPONSE FRAME:
 
 #include "modbusTcp.h"
 
-uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData) {
+uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData)
+{
 
     /*Local variable declaration */
-    uint16_t length = 0;
+    uint8_t length = 0;
     uint16_t limit = 0;
 
     /* Assigning values for transmitting buffer*/
@@ -46,19 +47,25 @@ uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory,
 
     p_modbusTxBuf[7] = p_parseModbusTcpData->functionCode;
 
-    for (limit = 0; limit < p_parseModbusTcpData->numberofRegister.v[0]; limit++) {
-        if (p_parseModbusTcpData->data[limit].Val >= IllegalDataCheck) /* checks for illegal data value */ {
+    for (limit = 0; limit < p_parseModbusTcpData->numberofRegister.v[0]; limit++)
+    {
+        if (p_parseModbusTcpData->data[limit].Val >= IllegalDataCheck) /* checks for illegal data value */
+        {
 
             p_parseModbusTcpData->functionCode = p_parseModbusTcpData->functionCode + 0x80;
             modbusError(p_parseModbusTcpData, p_modbusTxBuf, Illegal_Data_Value);
             limit = p_parseModbusTcpData->numberofRegister.v[0] + 1;
             length = 0X09;
-        } else {
+        }
+        else
+        {
+
             p_dataMemory[p_parseModbusTcpData->startAddress.Val + limit] = p_parseModbusTcpData->data[limit].v[0] +
-                    (p_parseModbusTcpData->data[limit].v[1] * 0x100); /* Writes the data to register */
+                                                                           (p_parseModbusTcpData->data[limit].v[1] * 0x100); /* Writes the data to register */
         }
     }
-    if (0x10 == p_parseModbusTcpData->functionCode) {
+    if (0x10 == p_parseModbusTcpData->functionCode)
+    {
         /* Assigning values for transmitting buffer*/
         p_modbusTxBuf[8] = p_parseModbusTcpData->startAddress.v[1];
         p_modbusTxBuf[9] = p_parseModbusTcpData->startAddress.v[0];

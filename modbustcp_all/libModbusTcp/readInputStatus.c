@@ -60,7 +60,8 @@ uint16_t readInputStatus(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacke
     /* local variable declaration */
     uint16_t NoOfBits = 0, Regbit = 0, reg = 0, RegbitTx = 0, regTx = 0, byte_index = 0, bit_count = 0, wordOffset = 0;
     uint16_t Txtempbuf1[MaxSizeTxtempbuf] = {0};
-    uint16_t byte_count = 0, limit = 0, coil_bit = 0;
+    uint16_t byte_count = 0, coil_bit = 0;
+    uint8_t limit = 0;
 
     /* Assigning values for transmitting buffer*/
     p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];

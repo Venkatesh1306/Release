@@ -59,9 +59,10 @@ readCoilStatus(uint8_t *p_modbusTxBuf, const uint16_t *p_dataMemory, mbPacketPar
      */
 
     /* local variable declaration */
+    uint8_t limit = 0;
     uint16_t NoOfBits = 0, Regbit = 0, reg = 0, regTx = 0, byte_index = 0, bit_count = 0, wordOffset = 0, RegbitTx = 0;
     uint16_t Txtempbuf[MaxSizeTxtempbuf] = {0};
-    uint16_t byte_count = 0, limit = 0, coil_bit = 0;
+    uint16_t byte_count = 0, coil_bit = 0;
 
     p_modbusTxBuf[0] = p_parseModbusTcpData->transactionID.v[1];
     p_modbusTxBuf[1] = p_parseModbusTcpData->transactionID.v[0];

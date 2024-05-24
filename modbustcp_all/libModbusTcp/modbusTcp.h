@@ -35,6 +35,7 @@
  */
 
 #include "..\modbusTcptypedef.h"
+#include <stdio.h>
 
 #ifndef MODBUSTCP_H
 #define MODBUSTCP_H
@@ -50,14 +51,15 @@
 #define PresetMultipleRegisters 16
 
 /* Definitions for size which the array and variables not be exceed*/
-#define DataRegistersize 0x7d
-#define DataRegistersizeCheck (DataRegistersize - 1)
-#define CoilDatasize 0x100
-#define MaxSizeTcpTx 100
-#define MaxSizeTxtempbuf 30
-#define MaxSizeCoilData 25
-#define MaxSizeCoilDataCheck (MaxSizeCoilData - 1)
-#define IllegalDataCheck 65000
+#define Checksize 1u
+#define DataRegistersize 0x7du
+#define DataRegistersizeCheck (DataRegistersize - Checksize)
+#define CoilDatasize 0x100u
+#define MaxSizeTcpTx 100u
+#define MaxSizeTxtempbuf 30u
+#define MaxSizeCoilData 25u
+#define MaxSizeCoilDataCheck (MaxSizeCoilData - Checksize)
+#define IllegalDataCheck 65000u
 
 /*Error Code Definitions */
 #define Illegal_Function_Code 0x01u
@@ -82,7 +84,7 @@ typedef struct {
 } mbPacketParse_t;
 
 /* declaration of functions */
-uint16_t modbusTcpFrame(const uint8_t *p_modbusRxBuf, uint16_t *p_dataMemory, uint8_t *p_modbusTxBuf, uint16_t *modBusframeLength); /* Frame function */
+uint16_t modbusTcpFrame(const uint8_t *p_modbusRxBuf, uint16_t *p_dataMemory, uint8_t *p_modbusTxBuf, uint8_t *modBusframeLength); /* Frame function */
 uint16_t modbusTcpParse(mbPacketParse_t *p_parseModbusTcpData, const uint8_t *p_modbusRxBuf); /* Parse Function */
 uint16_t readCoilStatus(uint8_t *p_modbusTxBuf, const uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x01 */
 uint16_t readInputStatus(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x02 */
@@ -92,6 +94,6 @@ uint16_t forceSingleCoil(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacke
 uint16_t presetSingleRegister(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x06 */
 uint16_t forceMultipleCoils(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x0f */
 uint16_t presetMultipleRegisters(uint8_t *p_modbusTxBuf, uint16_t *p_dataMemory, mbPacketParse_t *p_parseModbusTcpData); /* Function Code - 0x10 */
-void modbusError(mbPacketParse_t *p_parseModbusTcpData, uint8_t *p_modbusTxBuf, unsigned char exceptioncode); /* Error Function */
+void modbusError(mbPacketParse_t *p_parseModbusTcpData, uint8_t *p_modbusTxBuf, uint8_t exceptioncode); /* Error Function */
 
 #endif
